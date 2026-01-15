@@ -4,8 +4,8 @@ from django.db import models
 # Create your models here.
 class Firm(models.Model):
     name = models.CharField(max_length=200)
-    IC = models.CharField(max_length=10, blank=True)
-    DIC = models.CharField(max_length=12, blank=True)
+    ic = models.CharField(max_length=10, blank=True)
+    dic = models.CharField(max_length=12, blank=True)
     street = models.CharField(max_length=100, blank=True)
     city = models.CharField(max_length=100, blank=True)
     state = models.CharField(max_length=100, blank=True)
@@ -38,6 +38,12 @@ class UserProfile(models.Model):
         return self.user.username
 
 
+class PriorityType(models.IntegerChoices):
+    LOW = 1, 'Low'
+    NORMAL = 2, 'Normal'
+    HIGH = 3, 'High'
+    CRITICAL = 4, 'Critical'
+
 class Ticket(models.Model):
     STATUS_CHOICES = [
         ('new', 'New'),
@@ -48,20 +54,13 @@ class Ticket(models.Model):
         ('closed', 'Closed'),
     ]
 
-    PRIORITY_CHOICES = [
-        ('low', 'Low'),
-        ('normal', 'Normal'),
-        ('high', 'High'),
-        ('critical', 'Critical'),
-    ]
-
     ticket_number = models.CharField(max_length=15, unique=True, blank=True, editable=False)
     firm = models.ForeignKey(Firm, related_name='tickets', on_delete=models.PROTECT)
     user = models.ForeignKey(User, related_name='tickets', on_delete=models.PROTECT)
     subject = models.CharField(max_length=100)
     description = models.TextField(max_length=5000 ,blank=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
-    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='normal')
+    priority = models.IntegerField(choices=PriorityType, default=PriorityType.NORMAL)
     assigned_to = models.ForeignKey(User, related_name='assigned_agent', on_delete=models.PROTECT, blank=True, null=True)
     supervisor = models.ForeignKey(User, related_name='supervisor', on_delete=models.PROTECT, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
