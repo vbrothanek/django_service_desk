@@ -91,3 +91,17 @@ class Ticket(models.Model):
     def __str__(self):
         return f"#{self.ticket_number} - {self.subject}"
 
+
+class Record(models.Model):
+    ticket = models.ForeignKey(Ticket, related_name='records', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='records', on_delete=models.PROTECT)
+    description = models.TextField(max_length=5000)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Record'
+        verbose_name_plural = 'Records'
+
+    def __str__(self):
+        return f"#{self.ticket.ticket_number} - {self.description}"
+
