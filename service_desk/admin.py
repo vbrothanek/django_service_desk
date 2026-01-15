@@ -7,9 +7,9 @@ from .models import Firm, UserProfile, Ticket, Record
 # Register your models here.
 @admin.register(Firm)
 class FirmAdmin(admin.ModelAdmin):
-    list_display = ['name', 'IC', 'city', 'is_active']
+    list_display = ['name', 'ic', 'city', 'is_active']
     list_filter = ['is_active']
-    search_fields = ['name', 'IC']
+    search_fields = ['name', 'ic']
 
 
 
@@ -34,5 +34,5 @@ class TicketAdmin(admin.ModelAdmin):
 
 @admin.register(Record)
 class RecordAdmin(admin.ModelAdmin):
-    list_display = ['ticket_id', 'description']
-    list_filter = ['ticket_id', 'description']
+    list_display = ['ticket', 'description']
+    list_filter = ['ticket__ticket_number', 'description']
