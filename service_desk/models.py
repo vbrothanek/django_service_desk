@@ -55,12 +55,12 @@ class StatusLevel(models.IntegerChoices):
 class Ticket(models.Model):
     ticket_number = models.CharField(max_length=15, unique=True, blank=True, editable=False)
     company = models.ForeignKey(Company, related_name='tickets', on_delete=models.PROTECT)
-    user = models.ForeignKey(User, related_name='tickets', on_delete=models.PROTECT)
+    user = models.ForeignKey(User, related_name='created_tickets', on_delete=models.PROTECT)
     subject = models.CharField(max_length=100)
     description = models.TextField(max_length=5000 ,blank=False)
     status = models.IntegerField(choices=StatusLevel, default=StatusLevel.NEW)
     priority = models.IntegerField(choices=PriorityType, default=PriorityType.NORMAL)
-    assigned_to = models.ForeignKey(User, related_name='assigned_agent', on_delete=models.PROTECT, blank=True, null=True)
+    assigned_to = models.ForeignKey(User, related_name='assigned_tickets', on_delete=models.PROTECT, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
     due_date = models.DateField(blank=True, null=True)
@@ -91,7 +91,7 @@ class Ticket(models.Model):
 
 class Record(models.Model):
     ticket = models.ForeignKey(Ticket, related_name='records', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name='records', on_delete=models.PROTECT)
+    user = models.ForeignKey(User, related_name='ticket_records', on_delete=models.PROTECT)
     message = models.TextField(max_length=5000)
     created_at = models.DateTimeField(auto_now_add=True)
 
