@@ -1,8 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-# Create your models here.
-class Firm(models.Model):
+class Company(models.Model):
     name = models.CharField(max_length=200)
     ic = models.CharField(max_length=10, blank=True)
     dic = models.CharField(max_length=12, blank=True)
@@ -17,8 +16,8 @@ class Firm(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = 'Firm'
-        verbose_name_plural = 'Firms'
+        verbose_name = 'Company'
+        verbose_name_plural = 'Companies'
 
     def __str__(self):
         return self.name
@@ -27,8 +26,7 @@ class Firm(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     phone = models.CharField(max_length=16, blank=True)
-    agent_id = models.CharField(max_length=100, blank=True)
-    firms = models.ManyToManyField(Firm)
+    companies = models.ManyToManyField(Company)
 
     class Meta:
         verbose_name = 'User Profile'
@@ -39,30 +37,30 @@ class UserProfile(models.Model):
 
 
 class PriorityType(models.IntegerChoices):
-    LOW = 1, 'Low'
-    NORMAL = 2, 'Normal'
-    HIGH = 3, 'High'
-    CRITICAL = 4, 'Critical'
+    LOW = 10, 'Low'
+    NORMAL = 20, 'Normal'
+    HIGH = 30, 'High'
+    CRITICAL = 40, 'Critical'
+
+
+class StatusLevel(models.IntegerChoices):
+    NEW = 10,'New'
+    ACCEPTED = 20,'Accepted'
+    IN_PROGRESS = 30,'In Progress'
+    WAITING = 40,'Waiting'
+    RESOLVED = 50,'Resolved'
+    CLOSED = 60,'Closed'
+
 
 class Ticket(models.Model):
-    STATUS_CHOICES = [
-        ('new', 'New'),
-        ('accepted', 'Accepted'),
-        ('in_progress', 'In Progress'),
-        ('waiting', 'Waiting for customer'),
-        ('resolved', 'Resolved'),
-        ('closed', 'Closed'),
-    ]
-
     ticket_number = models.CharField(max_length=15, unique=True, blank=True, editable=False)
-    firm = models.ForeignKey(Firm, related_name='tickets', on_delete=models.PROTECT)
+    company = models.ForeignKey(Company, related_name='tickets', on_delete=models.PROTECT)
     user = models.ForeignKey(User, related_name='tickets', on_delete=models.PROTECT)
     subject = models.CharField(max_length=100)
     description = models.TextField(max_length=5000 ,blank=False)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
+    status = models.IntegerField(choices=StatusLevel, default=StatusLevel.NEW)
     priority = models.IntegerField(choices=PriorityType, default=PriorityType.NORMAL)
     assigned_to = models.ForeignKey(User, related_name='assigned_agent', on_delete=models.PROTECT, blank=True, null=True)
-    supervisor = models.ForeignKey(User, related_name='supervisor', on_delete=models.PROTECT, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
     due_date = models.DateField(blank=True, null=True)
@@ -94,7 +92,7 @@ class Ticket(models.Model):
 class Record(models.Model):
     ticket = models.ForeignKey(Ticket, related_name='records', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='records', on_delete=models.PROTECT)
-    description = models.TextField(max_length=5000)
+    message = models.TextField(max_length=5000)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -102,5 +100,5 @@ class Record(models.Model):
         verbose_name_plural = 'Records'
 
     def __str__(self):
-        return f"#{self.ticket.ticket_number} - {self.description}"
+        return f"#{self.ticket.ticket_number} - {self.message}"
 

@@ -2,10 +2,9 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from .models import Firm, UserProfile, Ticket, Record
+from .models import Company, UserProfile, Ticket, Record
 
-# Register your models here.
-@admin.register(Firm)
+@admin.register(Company)
 class FirmAdmin(admin.ModelAdmin):
     list_display = ['name', 'ic', 'city', 'is_active']
     list_filter = ['is_active']
@@ -34,5 +33,5 @@ class TicketAdmin(admin.ModelAdmin):
 
 @admin.register(Record)
 class RecordAdmin(admin.ModelAdmin):
-    list_display = ['ticket', 'description']
-    list_filter = ['ticket__ticket_number', 'description']
+    list_display = ['ticket', 'message']
+    list_filter = ['ticket__ticket_number', 'message']
