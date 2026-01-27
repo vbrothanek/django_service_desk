@@ -1,10 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Ticket list</title>
-</head>
-<body>
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Ticket list{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  </head>
+  <body>
 
-</body>
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'service_desk:ticket_list' %}">Brotel Service Desk</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="mb-4">Seznam tiketů</h1>
+
+        {% if tickets %}
+            <p class="text-muted">Celkem tiketů: <strong>{{ tickets.count }}</strong></p>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Předmět</th>
+                            <th>Uživatel</th>
+                            <th>Firma</th>
+                            <th>Stav</th>
+                            <th>Priorita</th>
+                            <th>Vytvořeno</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr>
+                            <td>{{ ticket.ticket_number }}</td>
+                            <td>
+                                <strong>{{ ticket.subject }}</strong>
+                                <br>
+                                <small class="text-muted">{{ ticket.description|truncatewords:10 }}</small>
+                            </td>
+                            <td>{{ ticket.user.username|default:"Nepřiřazeno" }}</td>
+                            <td>{{ ticket.company.name|default:"Bez firmy" }}</td>
+                            <td>
+                                {% if ticket.status == 'OPEN' %}
+                                    <span class="badge bg-success">{{ ticket.get_status_display }}</span>
+                                {% elif ticket.status == 'IN_PROGRESS' %}
+                                    <span class="badge bg-warning text-dark">{{ ticket.get_status_display }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ ticket.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if ticket.priority == 100 %}
+                                    <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill">{{ ticket.get_priority_display }}</span>
+                                {% elif ticket.priority == 50 %}
+                                    <span class="badge bg-warning text-dark">{{ ticket.get_priority_display }}</span>
+                                {% else %}
+                                    <span class="badge bg-info">{{ ticket.get_priority_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ ticket.created_at|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i> Žádné tikety nebyly nalezeny.
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  </body>
 </html>
