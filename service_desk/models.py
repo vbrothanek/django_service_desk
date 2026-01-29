@@ -1,4 +1,5 @@
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser, User
 from django.db import models
 
 class Company(models.Model):
@@ -23,17 +24,9 @@ class Company(models.Model):
         return self.name
 
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+class User(AbstractUser):
     phone = models.CharField(max_length=16, blank=True)
     companies = models.ManyToManyField(Company)
-
-    class Meta:
-        verbose_name = 'User Profile'
-        verbose_name_plural = 'User Profiles'
-
-    def __str__(self):
-        return self.user.username
 
 
 class PriorityType(models.IntegerChoices):

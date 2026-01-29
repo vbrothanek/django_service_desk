@@ -1,8 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
 
-from .models import Company, UserProfile, Ticket, Record
+from .models import Company, User, Ticket, Record
 
 @admin.register(Company)
 class FirmAdmin(admin.ModelAdmin):
@@ -12,17 +11,15 @@ class FirmAdmin(admin.ModelAdmin):
 
 
 
-# UserProfileInline > To be able to edit UserProfile from user settings.
-class UserProfileInline(admin.StackedInline):
-    model = UserProfile
-    can_delete = False
-
+@admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    inlines = [UserProfileInline]
-
-admin.site.unregister(User)
-admin.site.register(User, CustomUserAdmin)
-
+    fieldsets = UserAdmin.fieldsets + (
+        ('Additional info', {'fields': ('phone', 'companies')}),
+    )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ('Additional info', {'fields': ('phone', 'companies')}),
+    )
+    list_display = ('username', 'email', 'phone', 'is_staff')
 
 
 @admin.register(Ticket)

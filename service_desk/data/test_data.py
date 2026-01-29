@@ -1,21 +1,21 @@
-from service_desk.models import Ticket, Company
-from django.contrib.auth.models import User
+from service_desk.models import Ticket, Company, User
 
 
 def create_ticket():
     try:
-        company = Company.objects.get(name='Treti spolecnost v HD')
+        company = Company.objects.get(name='Spolecnost 03 a.s.')
     except Company.DoesNotExist:
-        print(f'Company does not exist')
+        print('Company does not exist')
+        return
 
     try:
         user = User.objects.get(username='duser')
     except User.DoesNotExist:
-        print(f'User does not exist')
+        print('User does not exist')
+        return
 
     for n in range(100, 120):
         print(n)
-
         Ticket.objects.create(
             subject=f'Ticket #99{n}',
             description=f'Ticket #99{n} - some description that is provided.',
@@ -26,4 +26,4 @@ def create_ticket():
         )
         print(f'created ticket {n}')
 
-    print(f': {Ticket.objects.count()} tickets')
+    print(f'Total: {Ticket.objects.count()} tickets')
