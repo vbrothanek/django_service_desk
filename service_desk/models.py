@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser, User
 from django.db import models
 
 class Company(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     ic = models.CharField(max_length=10, blank=True)
     dic = models.CharField(max_length=12, blank=True)
     street = models.CharField(max_length=100, blank=True)
