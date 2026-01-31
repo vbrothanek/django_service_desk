@@ -1,0 +1,24 @@
+{
+  "name": "django_service_desk",
+  "version": "1.0.0",
+  "description": "Project description and details will be added.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vbrothanek/django_service_desk.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/vbrothanek/django_service_desk/issues"
+  },
+  "homepage": "https://github.com/vbrothanek/django_service_desk#readme",
+  "dependencies": {
+    "bootstrap": "^5.3.8"
+  }
+}

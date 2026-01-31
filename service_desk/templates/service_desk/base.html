@@ -1,0 +1,25 @@
+{% load static %}
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Django Service Desk{% endblock %}</title>
+    <link href="{% static 'service_desk/css/bootstrap.min.css' %}" rel="stylesheet">
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body>
+  	<nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'service_desk:ticket_list' %}">Django Service Desk</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="{% static 'service_desk/js/bootstrap.bundle.min.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>
