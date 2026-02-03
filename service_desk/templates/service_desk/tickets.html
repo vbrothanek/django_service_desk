@@ -1,0 +1,31 @@
+{% extends 'service_desk/_base.html' %}
+
+{% block content %}
+	<h1>Tickets</h1>
+
+	<div>
+		<h2>User</h2>
+		{{ user }} {{ request }}
+	</div>
+	<hr>
+	<div>
+		<h2>Latest tickets</h2>
+{#		{{ latest_tickets }}#}
+		<ul>
+		{% for ticket in latest_tickets %}
+			<li>{{ ticket.subject }}</li>
+		{% endfor %}
+		</ul>
+	</div>
+	<hr>
+	<div>
+		<h2>All tickets</h2>
+{#		{{ all_tickets }}#}
+		<ul>
+		{% for ticket in all_tickets %}
+			<li>{{ ticket.subject }}, {{ ticket.created_at }}</li>
+		{% endfor %}
+		</ul>
+	</div>
+
+{% endblock content %}
