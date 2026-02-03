@@ -1,0 +1,47 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Django Service Desk{% endblock %}</title>
+    <link href="{% static 'service_desk/css/bootstrap.min.css' %}" rel="stylesheet">
+    {% block extra_head %}{% endblock %}
+  </head>
+
+  <body>
+  	<div class="container-fluid">
+    	<div class="row">
+        	<div class="col-2 bg-dark vh-100 position-fixed top-0 start-0">
+				<a href="/service-desk/" class="d-flex align-items-center justify-content-center mt-3 mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+					<span class="fs-4">Django Service Desk</span>
+				</a>
+
+				<hr class="border-light opacity-25">
+
+				<ul class="nav nav-pills flex-column mb-2">
+					<li class="nav-item">
+						<a class="nav-link text-light active" aria-current="page" href="/service-desk/dashboard">Dashboard</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link text-light" href="/service-desk/tickets">All tickets</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link text-light" href="/service-desk/tickets/create">Create New Ticket</a>
+					</li>
+				</ul>
+        	</div>
+        	<div class="col-10 offset-md-3 offset-lg-2">
+            	<div class="container-fluid">
+        		{% block content %}{% endblock %}
+    			</div>
+        	</div>
+    	</div>
+	</div>
+
+    <script src="{% static 'service_desk/js/bootstrap.bundle.min.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+
+  </body>
+</html>
