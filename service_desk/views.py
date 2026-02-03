@@ -9,7 +9,7 @@ def ticket_list(request):
     return render(request, 'service_desk/ticket_list.html', context)
 
 def default_view(request):
-    return redirect('/')
+    return redirect('service_desk:tickets')
 
 # @login_required
 def dashboard_view(request):
