@@ -40,7 +40,7 @@ Add company, edit, list, delete
 '''
 
 from django.urls import path
-from . import views
+from service_desk import views
 
 def test_view(request):
     from django.shortcuts import HttpResponse
@@ -49,12 +49,12 @@ def test_view(request):
 app_name = 'service_desk'
 
 urlpatterns = [
-    path('ticket-list/', views.ticket_list, name='ticket_list'),
-    path('', test_view),
-    path('login/', test_view),
-    path('dashboard/', test_view),
-    path('tickets/', test_view),
-    path('tickets/create/', test_view),
+    path('ticket-list/', views.ticket_list, name='ticket-list'),
+    path('', views.default_view), # default_view - redirect to login or dashboard
+    path('login/', views.login_view, name='login'), # login_view
+    path('dashboard/', views.dashboard_view, name='dashboard'), # dashboard_view
+    path('tickets/', views.tickets_view, name='tickets'), # tickets_view
+    path('tickets/create/', views.create_ticket_view, name='new-ticket'), # create_ticket_view
     path('tickets/<int:ticket_number>', test_view),
     path('settings/', test_view),
     path('settings/users/', test_view),
