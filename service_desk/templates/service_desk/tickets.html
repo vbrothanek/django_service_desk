@@ -28,4 +28,13 @@
 		</ul>
 	</div>
 
+	<div>
+		<h2>User tickets</h2>
+		<ul>
+		{% for ticket in user_tickets %}
+			<li>{{ ticket.subject }}, {{ ticket.created_at }}</li>
+		{% endfor %}
+		</ul>
+	</div>
+
 {% endblock content %}
