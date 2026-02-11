@@ -6,39 +6,67 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Django Service Desk{% endblock %}</title>
-    <link href="{% static 'service_desk/css/bootstrap.min.css' %}" rel="stylesheet">
+
+  	<!-- Google fonts -->
+  	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+
+  	<!-- CSS styles -->
+  	<link href="{% static 'service_desk/css/bootstrap.min.css' %}" rel="stylesheet">
+  	<link href="{% static 'service_desk/css/style.css' %}" rel="stylesheet">
     {% block extra_head %}{% endblock %}
+
   </head>
 
   <body>
-  	<div class="container-fluid">
-    	<div class="row">
-        	<div class="col-2 bg-dark vh-100 position-fixed top-0 start-0">
-				<a href="/service-desk/" class="d-flex align-items-center justify-content-center mt-3 mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+
+  	<div class="d-flex d-lg-none">
+		<nav class="navbar bg-dark navbar-dark w-100">
+			<div class="d-flex w-100 px-3">
+				<a class="navbar-brand d-flex align-items-center text-white text-decoration-none" href="/service-desk/">
 					<span class="fs-4">Django Service Desk</span>
 				</a>
+				<button class="btn btn-outline-light d-lg-none ms-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasResponsive" aria-controls="offcanvasResponsive">☰</button>
+			</div>
+		</nav>
+	</div>
 
-				<hr class="border-light opacity-25">
+  	<!-- Layout -->
+	<div class="d-flex ">
+		<!-- Sidebar -->
+		<div class="custom-sidebar offcanvas-lg offcanvas-start bg-dark vh-100 justify-content-center" tabindex="-1" id="offcanvasResponsive" aria-labelledby="offcanvasResponsiveLabel">
+			<div class="offcanvas-header">
+				<h5 class="offcanvas-title text-white" id="offcanvasResponsiveLabel">Menu</h5>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasResponsive" aria-label="Close"></button>
+			</div>
+			<div class="offcanvas-body justify-content-center">
+				<nav class="w-100">
+					<a href="/service-desk/" class="d-flex align-items-center justify-content-center mt-3 mb-3 mb-md-0 me-md-auto text-white text-decoration-none w-100">
+						<span class="fs-4">Django Service Desk</span>
+					</a>
 
-				<ul class="nav nav-pills flex-column mb-2">
-					<li class="nav-item">
-						<a class="nav-link text-light active" aria-current="page" href="/service-desk/dashboard">Dashboard</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link text-light" href="/service-desk/tickets">All tickets</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link text-light" href="/service-desk/tickets/create">Create New Ticket</a>
-					</li>
-				</ul>
-        	</div>
+					<hr class="border-light opacity-25">
 
-        	<div class="col-10 offset-md-3 offset-lg-2">
+					<ul class="nav nav-pills flex-column mb-auto">
+						<li class="nav-item">
+							<a class="nav-link link-light link-opacity-75-hover  {% if active_page == 'dashboard' %}active{% endif %}" aria-current="page" href="/service-desk/dashboard">Dashboard</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link link-light link-opacity-75-hover {% if active_page == 'tickets' %}active{% endif %}" href="/service-desk/tickets">All tickets</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link link-light link-opacity-75-hover {% if active_page == 'tickets_create' %}active{% endif %}" href="/service-desk/tickets/create">Create New Ticket</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</div>
 
-        		{% block content %}{% endblock %}
-
-        	</div>
-    	</div>
+		<div class="flex-grow-1 p-3">
+			{% block content %}{% endblock %}
+		</div>
 	</div>
 
     <script src="{% static 'service_desk/js/bootstrap.bundle.min.js' %}"></script>

@@ -143,6 +143,9 @@ STATICFILES_DIRS = [
     BASE_DIR / 'service_desk' / 'static',
 ]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / '_media'
+
 # Forms Django-Crispy-Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"

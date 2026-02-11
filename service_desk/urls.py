@@ -54,8 +54,8 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),  # login_view
     path('dashboard/', views.dashboard_view, name='dashboard'),  # dashboard_view
     path('tickets/', views.tickets_view, name='tickets'),  # tickets_view
-    path('tickets/create/', views.create_ticket_view, name='new-ticket'),  # create_ticket_view
-    path('tickets/<int:ticket_number>', test_view),
+    path('tickets/create/', views.create_ticket_view, name='new_ticket'),  # create_ticket_view
+    path('tickets/<int:ticket_number>', views.ticket_detail_view, name='ticket_detail'), #ticket_detail_view
     path('settings/', test_view),
     path('settings/users/', test_view),
     path('settings/users/add/', test_view),

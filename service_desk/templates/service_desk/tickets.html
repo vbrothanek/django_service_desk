@@ -32,7 +32,11 @@
 		<h2>User tickets</h2>
 		<ul>
 		{% for ticket in user_tickets %}
-			<li>{{ ticket.subject }}, {{ ticket.created_at }}</li>
+			<li>
+				<a href="{% url 'service_desk:ticket_detail' ticket.ticket_number %}">
+					{{ ticket.subject }}, {{ ticket.created_at }}
+				</a>
+			</li>
 		{% endfor %}
 		</ul>
 	</div>

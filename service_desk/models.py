@@ -58,7 +58,7 @@ class Ticket(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     due_date = models.DateField(blank=True, null=True)
     date_of_completion = models.DateField(blank=True, null=True)
-    attachment = models.FileField(blank=True, null=True)
+    attachment = models.FileField(upload_to='ticket-attachments/' ,blank=True, null=True)
 
     def save(self, *args, **kwargs):
         '''

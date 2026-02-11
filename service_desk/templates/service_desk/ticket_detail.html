@@ -1,0 +1,11 @@
+{% extends 'service_desk/_base.html' %}
+
+{% block content %}
+
+	<h1>{{ ticket.ticket_number }}</h1>
+	<p>{{ ticket.company }}</p>
+	<p>{{ ticket.user }}</p>
+	<h2>{{ ticket.subject }}</h2>
+	<p>{{ ticket.description }}</p>
+
+{% endblock content %}
