@@ -44,11 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'service_desk',
+    'allauth',
+    'allauth.account',
     "debug_toolbar",
     "crispy_forms",
     "crispy_bootstrap5",
-    'allauth',
-    'allauth.account',
 ]
 
 MIDDLEWARE = [
@@ -130,6 +130,10 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+# SingUp page availability
+ACCOUNT_ADAPTER = "service_desk.adapters.NoSignupAccountAdapter"
+LOGIN_REDIRECT_URL = '/dashboard'
+LOGOUT_REDIRECT_URL = '/dashboard'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
