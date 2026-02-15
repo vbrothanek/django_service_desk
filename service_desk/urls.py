@@ -51,7 +51,6 @@ app_name = 'service_desk'
 urlpatterns = [
     path('ticket-list/', views.ticket_list, name='ticket-list'),
     path('', views.default_view),  # default_view - redirect to login or dashboard
-    path('login/', views.login_view, name='login'),  # login_view
     path('dashboard/', views.dashboard_view, name='dashboard'),  # dashboard_view
     path('tickets/', views.tickets_view, name='tickets'),  # tickets_view
     path('tickets/create/', views.create_ticket_view, name='new_ticket'),  # create_ticket_view
