@@ -23,7 +23,12 @@ body {
   to { opacity: 1; }
 }
 
-.custom-sidebar {
-    min-width: 250px;
-    width: 250px;
+@media (min-width: 992px) {
+    .custom-sidebar {
+        min-width: 280px;
+        width: 280px;
+        position: sticky;
+        top: 0;
+        align-self: flex-start;
+    }
 }
