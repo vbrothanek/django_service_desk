@@ -95,3 +95,17 @@ class Record(models.Model):
     def __str__(self):
         return f"#{self.ticket.ticket_number} - {self.message}"
 
+
+class TicketReadStatus(models.Model):
+    ticket = models.ForeignKey(Ticket, related_name='read_status', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='ticket_reads', on_delete=models.CASCADE)
+    last_read_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('ticket', 'user')
+
+    def __str__(self):
+        return f"{self.user} - {self.ticket} ({self.last_read_at})"
+
+
+
