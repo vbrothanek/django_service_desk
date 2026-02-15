@@ -12,6 +12,8 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
+  	<!-- Google MDI icons -->
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
 
   	<!-- CSS styles -->
   	<link href="{% static 'service_desk/css/bootstrap.min.css' %}" rel="stylesheet">
@@ -36,30 +38,68 @@
   	<!-- Layout -->
 	<div class="d-flex ">
 		<!-- Sidebar -->
-		<div class="custom-sidebar offcanvas-lg offcanvas-start bg-dark vh-100 justify-content-center" tabindex="-1" id="offcanvasResponsive" aria-labelledby="offcanvasResponsiveLabel">
+		<div class="custom-sidebar offcanvas-lg offcanvas-start bg-dark vh-100 d-flex flex-column" tabindex="-1" id="offcanvasResponsive">
 			<div class="offcanvas-header">
 				<h5 class="offcanvas-title text-white" id="offcanvasResponsiveLabel">Menu</h5>
 				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasResponsive" aria-label="Close"></button>
 			</div>
-			<div class="offcanvas-body justify-content-center">
-				<nav class="w-100">
-					<a href="/service-desk/" class="d-flex align-items-center justify-content-center mt-3 mb-3 mb-md-0 me-md-auto text-white text-decoration-none w-100">
+			<div class="offcanvas-body d-flex flex-column flex-grow-1 p-3">
+				<nav class="d-flex flex-column flex-grow-1">
+					<a href="/" class="d-flex align-items-center justify-content-center mt-3 mb-3 text-white text-decoration-none">
 						<span class="fs-4">Django Service Desk</span>
 					</a>
-
 					<hr class="border-light opacity-25">
-
 					<ul class="nav nav-pills flex-column mb-auto">
 						<li class="nav-item">
-							<a class="nav-link link-light link-opacity-75-hover  {% if active_page == 'dashboard' %}active{% endif %}" aria-current="page" href="/service-desk/dashboard">Dashboard</a>
+							<a class="nav-link link-light link-opacity-75-hover d-flex align-items-center {% if active_page == 'dashboard' %}active{% endif %}" href="/dashboard">
+								<span class="material-symbols-outlined">dashboard</span>
+								<span class="ms-2">Dashboard</span>
+							</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link link-light link-opacity-75-hover {% if active_page == 'tickets' %}active{% endif %}" href="/service-desk/tickets">All tickets</a>
+							<a class="nav-link link-light link-opacity-75-hover d-flex align-items-center mt-1 {% if active_page == 'tickets' %}active{% endif %}" href="/tickets">
+							<span class="material-symbols-outlined">list_alt</span>
+							<span class="ms-2">Tickets</span>
+							</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link link-light link-opacity-75-hover {% if active_page == 'tickets_create' %}active{% endif %}" href="/service-desk/tickets/create">Create New Ticket</a>
+							<a class="nav-link link-light link-opacity-75-hover d-flex align-items-center mt-1 {% if active_page == 'tickets_create' %}active{% endif %}" href="/tickets/create">
+								<span class="material-symbols-outlined">add</span>
+								<span class="ms-2">Create New Ticket</span>
+							</a>
 						</li>
 					</ul>
+					<hr class="border-light opacity-25">
+					<div class="dropdown">
+						<a href="#" class="d-flex align-items-center link-light link-opacity-75-hover text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+							<span class="material-symbols-outlined fs-3">account_circle</span>
+							<span class="m-2">{{ user.first_name }}</span>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-dark text-small">
+							<li>
+								<a class="dropdown-item d-flex align-items-center" href="#">
+									<span class="material-symbols-outlined">settings</span>
+									<span class="ms-2">Settings</span>
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item d-flex align-items-center" href="#">
+									<span class="material-symbols-outlined">user_attributes</span>
+									<span class="ms-2">Profile</span>
+								</a>
+							</li>
+							<li><hr class="dropdown-divider"></li>
+							<li>
+								<form method="post" action="{% url 'account_logout' %}">
+									{% csrf_token %}
+									<button type="submit" class="dropdown-item  d-flex align-items-center">
+										<span class="material-symbols-outlined">logout</span>
+										<span class="ms-2">Logout</span>
+									</button>
+								</form>
+							</li>
+						</ul>
+					</div>
 				</nav>
 			</div>
 		</div>

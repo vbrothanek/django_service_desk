@@ -1,0 +1,47 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Django Service Desk{% endblock %}</title>
+
+  	<!-- Google fonts -->
+  	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+
+  	<!-- CSS styles -->
+  	<link href="{% static 'service_desk/css/bootstrap.min.css' %}" rel="stylesheet">
+  	<link href="{% static 'service_desk/css/style.css' %}" rel="stylesheet">
+    {% block extra_head %}{% endblock %}
+
+  </head>
+
+  <body>
+	<div class="d-flex justify-content-center align-items-center" style="min-height:100vh;">
+      <div class="row g-0 shadow" style="width:100%; max-width:800px; border-radius:0.5rem; overflow:hidden;">
+
+        <!-- Left pane - info -->
+        <div class="col-md-6 bg-dark text-light p-4 d-flex flex-column justify-content-center">
+          <h2>Django Service Desk</h2>
+          <p class="mt-3">A system for managing requests and incidents.</p>
+        </div>
+
+        <!-- Right pane - login -->
+        <div class="col-md-6 bg-white p-4">
+          {% block content %}
+          {% endblock %}
+        </div>
+
+      </div>
+    </div>
+
+
+    <script src="{% static 'service_desk/js/bootstrap.bundle.min.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+
+  </body>
+</html>

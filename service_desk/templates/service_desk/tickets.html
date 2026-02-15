@@ -3,42 +3,32 @@
 {% block content %}
 	<h1>Tickets</h1>
 
-	<div>
-		<h2>User</h2>
-		{{ user }} {{ request }}
-	</div>
-	<hr>
-	<div>
-		<h2>Latest tickets</h2>
-{#		{{ latest_tickets }}#}
-		<ul>
-		{% for ticket in latest_tickets %}
-			<li>{{ ticket.subject }}</li>
-		{% endfor %}
-		</ul>
-	</div>
-	<hr>
-	<div>
-		<h2>All tickets</h2>
-{#		{{ all_tickets }}#}
-		<ul>
-		{% for ticket in all_tickets %}
-			<li>{{ ticket.subject }}, {{ ticket.created_at }}</li>
-		{% endfor %}
-		</ul>
-	</div>
-
-	<div>
-		<h2>User tickets</h2>
-		<ul>
-		{% for ticket in user_tickets %}
-			<li>
-				<a href="{% url 'service_desk:ticket_detail' ticket.ticket_number %}">
-					{{ ticket.subject }}, {{ ticket.created_at }}
-				</a>
-			</li>
-		{% endfor %}
-		</ul>
-	</div>
-
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Ticket number</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Assigned to</th>
+                <th>Last update</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr class="{% if ticket.is_unread %}fw-bold{% endif %}">
+                <td>{{ ticket.ticket_number }}</td>
+                <td><a href="{% url 'service_desk:ticket_detail' ticket.ticket_number %}" target="_blank">{{ ticket.subject }}</a></td>
+                <td>{{ ticket.get_status_display }}</td>
+                <td>{{ ticket.get_priority_display }}</td>
+                <td>{{ ticket.assigned_to|default:"Not assigned yet" }}</td>
+                <td>{{ ticket.last_update|date:"d.m.Y H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-muted">There is no tickets..</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock content %}
