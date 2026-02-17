@@ -133,7 +133,7 @@ AUTHENTICATION_BACKENDS = [
 # SingUp page availability
 ACCOUNT_ADAPTER = "service_desk.adapters.NoSignupAccountAdapter"
 LOGIN_REDIRECT_URL = '/dashboard'
-LOGOUT_REDIRECT_URL = '/dashboard'
+LOGOUT_REDIRECT_URL = '/'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

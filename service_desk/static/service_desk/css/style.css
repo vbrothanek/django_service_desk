@@ -32,3 +32,8 @@ body {
         align-self: flex-start;
     }
 }
+
+/* Hide asterisk (*) in crispy forms */
+.asteriskField {
+    display: none;
+}

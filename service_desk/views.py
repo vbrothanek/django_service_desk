@@ -60,7 +60,7 @@ def create_ticket_view(request):
     if request.method == 'GET':
         form = TicketForm()
     else:
-        form = TicketForm(request.POST)
+        form = TicketForm(request.POST, request.FILES)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.user = request.user
