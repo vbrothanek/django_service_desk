@@ -1,9 +1,14 @@
 from django.db.models import OuterRef, Subquery, DateTimeField
 from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
+from django_tables2 import RequestConfig
+from django_tables2.data import TableQuerysetData
+
 from .models import Ticket, Company, Record, TicketReadStatus
 from django.contrib.auth.decorators import login_required
 from service_desk.forms import TicketForm
+from django.core.paginator import Paginator
+from .tables import TicketTable
 
 def ticket_list(request):
     all_tickets = Ticket.objects.all()
@@ -30,25 +35,41 @@ def tickets_view(request):
         tickets = Ticket.objects.all()
     else:
         tickets = Ticket.objects.filter(
-            company__in = request.user.companies.all()
+            company__in=request.user.companies.all()
         )
 
-    tickets = tickets.order_by('-last_update')
+    # Řazení před paginací
+    sort = request.GET.get('sort', '-last_update')
+    tickets = tickets.order_by(sort)
 
+    # Paginace
+    page_number = request.GET.get('page', 1)
+    per_page = request.GET.get('per_page', 20)
+    paginator = Paginator(tickets, per_page=per_page)
+    page = paginator.get_page(page_number)
+    page_range = paginator.get_elided_page_range(page_number, on_each_side=2, on_ends=1)
+
+    # Načtení do listu - queryset se vyhodnotí jednou
+    tickets_page = list(page.object_list)
+
+    # is_unread nastavíš na objektech v paměti
     read_statuses = dict(
         TicketReadStatus.objects.filter(
-            user=request.user).values_list('ticket_id',
-            'last_read_at'))
+            user=request.user).values_list('ticket_id', 'last_read_at'))
 
-    for ticket in tickets:
+    for ticket in tickets_page:
         if ticket.pk not in read_statuses or ticket.last_update > read_statuses[ticket.pk]:
             ticket.is_unread = True
         else:
             ticket.is_unread = False
 
+    table = TicketTable(tickets_page, order_by=sort)
+
     context = {
         'active_page': 'tickets',
-        'tickets': tickets
+        'table': table,
+        'page': page,
+        'page_range': page_range,
     }
 
     return render(request, 'service_desk/tickets.html', context)
