@@ -2,11 +2,9 @@ from django.db.models import OuterRef, Subquery, DateTimeField
 from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django_tables2 import RequestConfig
-from django_tables2.data import TableQuerysetData
-
-from .models import Ticket, Company, Record, TicketReadStatus
+from .models import Ticket, Company, Record, TicketReadStatus, TicketAttachment
 from django.contrib.auth.decorators import login_required
-from service_desk.forms import TicketForm
+from service_desk.forms import TicketForm, TicketAttachmentForm
 from django.core.paginator import Paginator
 from .tables import TicketTable
 
@@ -62,6 +60,7 @@ def tickets_view(request):
             ticket.is_unread = False
 
     table = TicketTable(tickets_page, order_by=sort)
+    RequestConfig(request, paginate=False).configure(table)
 
     context = {
         'active_page': 'tickets',
@@ -78,21 +77,34 @@ def create_ticket_view(request):
 
     if request.method == 'GET':
         form = TicketForm()
+        attachment_form = TicketAttachmentForm()
     else:
-        form = TicketForm(request.POST, request.FILES)
+        form = TicketForm(request.POST)
+        attachment_form = TicketAttachmentForm(request.POST, request.FILES)
+        print('FILES: ', request.FILES)
+        print('POST: ', request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.user = request.user
             instance.save()
 
+            for file in request.FILES.getlist('file'):
+                print(file)
+                TicketAttachment.objects.create(
+                    ticket = instance,
+                    file = file,
+                    original_name = file.name,
+                    uploaded_by = request.user,
+                )
+
             if request.POST.get('action') == 'save_and_another':
                 return redirect('service_desk:new_ticket')
-            # print(instance.ticket_number)
             return redirect('service_desk:ticket_detail', ticket_number=instance.ticket_number)
 
     context = {
         'active_page': 'tickets_create',
         'form': form,
+        'attachment_form': attachment_form,
     }
 
     return render(request, 'service_desk/create_ticket_form.html', context)
