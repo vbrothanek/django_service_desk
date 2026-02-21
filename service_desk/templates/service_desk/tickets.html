@@ -3,43 +3,14 @@
 {% load django_tables2 %}
 
 {% block content %}
-	<h1>Tickets</h1>
+	<h2>Tickets</h2>
+	<hr class="opacity-25">
 
-{#    <table class="table table-hover">#}
-{#        <thead>#}
-{#            <tr>#}
-{#                <th>Ticket number</th>#}
-{#                <th>Subject</th>#}
-{#                <th>Status</th>#}
-{#                <th>Priority</th>#}
-{#                <th>Assigned to</th>#}
-{#                <th>Last update</th>#}
-{#            </tr>#}
-{#        </thead>#}
-{#        <tbody class="table-group-divider">#}
-{#            {% for ticket in page.object_list %}#}
-{#			<tr class="{% if ticket.is_unread %}fw-bold{% endif %}"#}
-{#				onclick="window.open('{% url 'service_desk:ticket_detail' ticket.ticket_number %}', '_blank')"#}
-{#				style="cursor: pointer;">#}
-{#				<td>{{ ticket.ticket_number }}</td>#}
-{#				<td>{{ ticket.subject }}</td>#}
-{#				<td>{{ ticket.get_status_display }}</td>#}
-{#				<td>{{ ticket.get_priority_display }}</td>#}
-{#				<td>{{ ticket.assigned_to|default:"Not assigned yet" }}</td>#}
-{#				<td>{{ ticket.last_update|date:"d.m.Y H:i" }}</td>#}
-{#			</tr>#}
-{#			{% empty %}#}
-{#			<tr>#}
-{#				<td colspan="6" class="text-center text-muted">There is no tickets..</td>#}
-{#			</tr>#}
-{#			{% endfor %}#}
-{#        </tbody>#}
-{#    </table>#}
 	{% render_table table %}
 
 	<div class="my-4 d-flex justify-content-end gap-3">
     <nav aria-label="Page navigation">
-      <ul class="pagination">
+      <ul class="pagination pagination-sm">
 
         {% if page.has_previous %}
         <li class="page-item">
@@ -67,7 +38,7 @@
     </nav>
 
 	<div class="dropdown">
-	  <a class="btn btn-outline-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+	  <a class="btn btn-sm btn-outline-primary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 		  {{ request.GET.per_page|default:"20" }}
 	  </a>
 
