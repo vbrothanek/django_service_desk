@@ -23,7 +23,7 @@ class TicketTable(Table):
         template_name = "django_tables2/bootstrap5.html"
         fields = ('ticket_number', 'subject', 'status', 'priority', 'assigned_to', 'created_at','last_update')
         attrs = {
-            "class": "table table-sm table-hover tickets-table",
+            "class": "table table-sm table-hover tickets-table table-striped",
             "thead": {"class": "pt-4"},
         }
         """
