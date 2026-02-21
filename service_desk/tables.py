@@ -24,7 +24,6 @@ class TicketTable(Table):
         fields = ('ticket_number', 'subject', 'status', 'priority', 'assigned_to', 'created_at','last_update')
         attrs = {
             "class": "table table-sm table-hover tickets-table",
-            "style": "font-size: 14px",
             "thead": {"class": "pt-4"},
         }
         """

@@ -38,6 +38,10 @@ body {
     display: none;
 }
 
+.tickets-table {
+    font-size: 14px;
+}
+
 .tickets-table thead tr th{
     background-color: #1a4c96;
 }
