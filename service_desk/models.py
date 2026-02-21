@@ -57,7 +57,7 @@ class Ticket(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     due_date = models.DateField(blank=True, null=True)
     date_of_completion = models.DateField(blank=True, null=True)
-    attachment = models.FileField(upload_to='ticket-attachments/' ,blank=True, null=True)
+    # attachment = models.FileField(upload_to='tickets/attachments/%Y/%m/%d' ,blank=True, null=True)
 
     def save(self, *args, **kwargs):
         '''
@@ -80,6 +80,22 @@ class Ticket(models.Model):
 
     def __str__(self):
         return f"#{self.ticket_number} - {self.subject}"
+
+
+class TicketAttachment(models.Model):
+    ticket = models.ForeignKey(Ticket, related_name='attachments', on_delete=models.CASCADE)
+    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    original_name = models.CharField(max_length=200)
+    file = models.FileField(upload_to='tickets/attachments/%Y/%m/%d')
+
+    class Meta:
+        verbose_name = 'Attachment'
+        verbose_name_plural = 'Attachments'
+
+    def __str__(self):
+        return self.original_name
+
 
 
 class Record(models.Model):
