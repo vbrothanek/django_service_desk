@@ -38,21 +38,19 @@ def tickets_view(request):
             company__in=request.user.companies.all()
         )
 
-    # Řazení před paginací
+    # Sorting before pagination
     sort = request.GET.get('sort', '-last_update')
     tickets = tickets.order_by(sort)
 
-    # Paginace
+    # Pagination
     page_number = request.GET.get('page', 1)
     per_page = request.GET.get('per_page', 20)
     paginator = Paginator(tickets, per_page=per_page)
     page = paginator.get_page(page_number)
     page_range = paginator.get_elided_page_range(page_number, on_each_side=2, on_ends=1)
 
-    # Načtení do listu - queryset se vyhodnotí jednou
     tickets_page = list(page.object_list)
 
-    # is_unread nastavíš na objektech v paměti
     read_statuses = dict(
         TicketReadStatus.objects.filter(
             user=request.user).values_list('ticket_id', 'last_read_at'))
