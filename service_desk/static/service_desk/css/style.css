@@ -37,3 +37,20 @@ body {
 .asteriskField {
     display: none;
 }
+
+.tickets-table thead tr th{
+    background-color: #1a4c96;
+}
+
+.ticket-row-link {
+    color: #1a4c96;
+}
+
+
+.tickets-table thead th{
+    padding: 8px 12px;
+}
+
+.tickets-table thead tr th > a{
+    color: white;
+}
