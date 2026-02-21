@@ -8,4 +8,45 @@
 	<h2>{{ ticket.subject }}</h2>
 	<p>{{ ticket.description }}</p>
 
+{% if ticket.attachments.all %}
+    <h5>Attachments</h5>
+    {% for attachment in ticket.attachments.all %}
+
+		{% with attachment.original_name|lower as name %}
+			{% if '.jpg' in name or '.jpeg' in name or '.png' in name or '.gif' in name or '.webp' in name %}
+				<button type="button" class="btn btn-sm btn-outline-primary mb-1"
+						data-bs-toggle="modal"
+						data-bs-target="#attachmentModal{{ forloop.counter }}">
+					<span class="material-symbols-outlined">attach_file</span>
+					{{ attachment.original_name }}
+				</button>
+			{% else %}
+				<a href="{{ attachment.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary mb-1">
+					<span class="material-symbols-outlined">attach_file</span>
+					{{ attachment.original_name }}
+				</a>
+			{% endif %}
+		{% endwith %}
+
+		{% with attachment.original_name|lower as name %}
+			{% if '.jpg' in name or '.jpeg' in name or '.png' in name or '.gif' in name or '.webp' in name %}
+				<div class="modal fade" id="attachmentModal{{ forloop.counter }}" tabindex="-1">
+					<div class="modal-dialog modal-xl modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">{{ attachment.original_name }}</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+							</div>
+							<div class="modal-body text-center">
+								<img src="{{ attachment.file.url }}" class="img-fluid">
+							</div>
+						</div>
+					</div>
+				</div>
+			{% endif %}
+		{% endwith %}
+
+    {% endfor %}
+{% endif %}
+
 {% endblock content %}
