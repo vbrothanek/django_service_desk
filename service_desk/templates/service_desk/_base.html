@@ -71,9 +71,14 @@
 					</ul>
 					<hr class="border-light opacity-25">
 					<div class="dropdown">
-						<a href="#" class="d-flex align-items-center link-light link-opacity-75-hover text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-							<span class="material-symbols-outlined fs-3">account_circle</span>
-							<span class="m-2">{{ user.first_name }}</span>
+						<a href="#" class="d-flex align-items-center link-light link-opacity-75-hover text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
+							<div class="d-flex align-items-center justify-content-center rounded-circle text-white user-account-profile-picture">
+								{{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}
+							</div>
+							<div class="ms-3 d-flex flex-column">
+								<span>{{ user.first_name }}</span>
+								<span class="small user-profile-mail">{{ user.email }}</span>
+							</div>
 						</a>
 						<ul class="dropdown-menu dropdown-menu-dark text-small">
 							<li>

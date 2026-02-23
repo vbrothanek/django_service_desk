@@ -44,11 +44,11 @@ body {
 }
 
 .tickets-table thead tr th{
-    background-color: #1a4c96;
+    background-color: #0F4C75;
 }
 
 .ticket-row-link {
-    color: #1a4c96;
+    color: #0F4C75;
 }
 
 
@@ -161,4 +161,16 @@ body {
 .dropdown-item:hover {
     background-color: #f0f0f0 !important;
     color: #1B262C !important;
+}
+
+.user-account-profile-picture {
+    background: #0F4C75;
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+}
+
+.user-profile-mail {
+    font-size: 13px;
+    color: #bcbfbf;
 }

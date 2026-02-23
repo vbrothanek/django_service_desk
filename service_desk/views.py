@@ -122,5 +122,6 @@ def ticket_detail_view(request, ticket_number):
         }
     )
 
-    context = {'ticket': ticket}
+    context = {'ticket': ticket,
+               'active_page': 'tickets'}
     return render(request, 'service_desk/ticket_detail.html', context)
