@@ -74,22 +74,34 @@ def tickets_view(request):
 
 @login_required
 def create_ticket_view(request):
+    user_groups = request.user.groups.values_list('name', flat=True)
+
+    # Specify the queryset of company by the role of the user.
+    if 'Agents' in user_groups:
+        companies = Company.objects.filter(is_active=True)
+    else:
+        companies = request.user.companies.filter(is_active=True)
+
 
     if request.method == 'GET':
         form = TicketForm()
+        form.fields['company'].queryset = companies
+
+        # If user have access only to one company, automatically fill the filed
+        if companies.count() == 1:
+            form.fields['company'].initial = companies.first()
+
         attachment_form = TicketAttachmentForm()
     else:
         form = TicketForm(request.POST)
+        form.fields['company'].queryset = companies
         attachment_form = TicketAttachmentForm(request.POST, request.FILES)
-        print('FILES: ', request.FILES)
-        print('POST: ', request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.user = request.user
             instance.save()
 
             for file in request.FILES.getlist('file'):
-                print(file)
                 TicketAttachment.objects.create(
                     ticket = instance,
                     file = file,
