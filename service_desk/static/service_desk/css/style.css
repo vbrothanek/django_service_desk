@@ -104,19 +104,19 @@ body {
 }
 
 
-/* Sidebar a offcanvas pozadí */
+/* Sidebar a offcanvas backgroud */
 .bg-dark {
     background-color: #1B262C !important;
 }
 
-/* Aktivní nav-pill */
+/* active nav-pill */
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
     background-color: #0F4C75 !important;
     color: #f8f9fa !important;
 }
 
-/* Tlačítka */
+/* Buttons + paginations */
 .btn-primary {
     background-color: #0F4C75 !important;
     border-color: #0F4C75 !important;
