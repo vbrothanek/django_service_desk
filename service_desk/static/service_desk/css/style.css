@@ -102,3 +102,61 @@ body {
 .create-ticket-form .mb-3 {
     margin-bottom: 8px !important;
 }
+
+
+/* Sidebar a offcanvas pozadí */
+.bg-dark {
+    background-color: #1B262C !important;
+}
+
+/* Aktivní nav-pill */
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: #0F4C75 !important;
+    color: #f8f9fa !important;
+}
+
+/* Tlačítka */
+.btn-primary {
+    background-color: #0F4C75 !important;
+    border-color: #0F4C75 !important;
+}
+
+.btn-primary:hover {
+    background-color: #3282B8 !important;
+    border-color: #3282B8 !important;
+}
+
+.page-item.active .page-link {
+    background-color: #0F4C75 !important;
+    border-color: #0F4C75 !important;
+    color: #f8f9fa !important;
+}
+
+.page-link {
+    color: #0F4C75 !important;
+}
+
+.btn-outline-primary {
+    color: #0F4C75 !important;
+    border-color: #dee2e6 !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0F4C75 !important;
+    border-color: #0F4C75 !important;
+    color: #f8f9fa !important;
+}
+
+.btn-outline-primary:active,
+.btn-outline-primary.active,
+.btn-outline-primary.show {
+    background-color: #0F4C75 !important;
+    border-color: #0F4C75 !important;
+    color: #f8f9fa !important;
+}
+
+.dropdown-item:hover {
+    background-color: #f0f0f0 !important;
+    color: #1B262C !important;
+}
