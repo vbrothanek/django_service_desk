@@ -17,11 +17,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+admin_url = os.getenv('ADMIN_URL') +'/'
 
 urlpatterns = [
     path('',include('service_desk.urls')),
     path('accounts/', include('allauth.urls')),
-    path('djsdp-admin/', admin.site.urls),
+    path(admin_url, admin.site.urls),
 ]
 
 if settings.DEBUG:
