@@ -6,6 +6,7 @@
 - [ ] Nová tabulka pro historii v rámci ticketů
 - [ ] Nova Tabulka změn u ticketů
 - [ ] Nove pole v Ticket model - na vedomi/sledujici
+- [ ] Optimalizovat SQL dotazy v prehledu ticketu
 - [x] Osetrit soubory ktere se nahravaji - MIME typ, pripona souboru, velikost souboru.
 - [ ] Implementovat Drag&Drop upload souboru - FilePond
 - [ ] ToDo list pro ticket
