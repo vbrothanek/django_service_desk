@@ -21,7 +21,7 @@ from django.conf import settings
 urlpatterns = [
     path('',include('service_desk.urls')),
     path('accounts/', include('allauth.urls')),
-    path('admin/', admin.site.urls),
+    path('djsdp-admin/', admin.site.urls),
 ]
 
 if settings.DEBUG:
