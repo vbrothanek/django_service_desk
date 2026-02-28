@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django_tables2 import RequestConfig
 from .models import Ticket, Company, Record, TicketReadStatus, TicketAttachment
 from django.contrib.auth.decorators import login_required
-from service_desk.forms import TicketForm, TicketAttachmentForm
+from service_desk.forms import TicketForm, TicketAttachmentForm, TicketDetailForm, TicketDetailFollowersForm
 from django.core.paginator import Paginator
 from .tables import TicketTable
 
@@ -91,7 +91,7 @@ def create_ticket_view(request):
         form = TicketForm()
         form.fields['company'].queryset = companies
 
-        # If user have access only to one company, automatically fill the filed
+        # If user only have access to one company, automatically fill the filed
         if companies.count() == 1:
             form.fields['company'].initial = companies.first()
 
@@ -130,6 +130,7 @@ def create_ticket_view(request):
 def ticket_detail_view(request, ticket_number):
     ticket = get_object_or_404(Ticket, ticket_number=ticket_number)
 
+    #Update Read Status when user involved in ticket opened the ticket.
     TicketReadStatus.objects.update_or_create(
         ticket = ticket,
         user = request.user,
@@ -138,6 +139,12 @@ def ticket_detail_view(request, ticket_number):
         }
     )
 
+    form = TicketDetailForm(instance=ticket)
+    form_followers = TicketDetailFollowersForm(instance=ticket)
+
     context = {'ticket': ticket,
+               'ticket_entry': form,
+               'followers': form_followers,
                'active_page': 'tickets'}
+
     return render(request, 'service_desk/ticket_detail.html', context)

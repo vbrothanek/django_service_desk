@@ -76,3 +76,49 @@ class TicketAttachmentForm(forms.Form):
             validated = validate_attachment(file)
             result.append(validated)
         return result
+
+
+class TicketDetailForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['company', 'subject', 'description', 'priority', 'due_date', 'status']
+        widgets = {
+            'due_date': forms.DateInput(attrs={'type': 'date'}),
+            'company': forms.Select(attrs={'class': 'tom-select-company-ticket-detail', 'placeholder': 'Select company...'}),
+            'priority': forms.Select(attrs={'class': 'tom-select-priority'}),
+            'status': forms.Select(attrs={'class': 'tom-select-status-ticket-detail'})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['company'].empty_label = ''
+        self.fields['subject'].widget.attrs['disabled'] = True
+        self.fields['subject'].required = False
+
+        if self.instance and self.instance.pk:
+            self.fields['subject'].initial = self.instance.subject
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('company', css_class='col-4'),
+                Column('due_date'),
+                Column('priority'),
+                Column('status')),
+            Row(Column('subject')),
+            Row(Column('description'))
+            )
+
+class TicketDetailFollowersForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['followers']
+        widgets = {
+            'followers': forms.SelectMultiple(attrs={'class': 'tom-select-followers', 'placeholder': 'Select followers...'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['followers'].label = False
+

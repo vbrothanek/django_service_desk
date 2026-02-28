@@ -3,9 +3,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('select.tom-select-company').forEach(select => {
         new TomSelect(select, {
             allowEmptyOption: true,
-            // plugins: ['remove_button'],
             placeholder: 'Select company...',
             items: [],
+        })
+    })
+
+    document.querySelectorAll('select.tom-select-company-ticket-detail').forEach(select => {
+        new TomSelect(select, {
+            allowEmptyOption: true,
         })
     })
 
@@ -14,4 +19,19 @@ document.addEventListener("DOMContentLoaded", () => {
         controlInput: null,
         })
     })
+
+    document.querySelectorAll('select.tom-select-status-ticket-detail').forEach(select => {
+        new TomSelect(select, {
+            allowEmptyOption: true,
+        })
+    })
+
+    document.querySelectorAll('select.tom-select-followers').forEach(select => {
+        new TomSelect(select, {
+            allowEmptyOption: true,
+            plugins: ['remove_button'],
+            hideSelected: true,
+        })
+    })
 })
+

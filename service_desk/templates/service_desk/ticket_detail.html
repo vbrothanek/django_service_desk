@@ -1,4 +1,11 @@
 {% extends 'service_desk/_base.html' %}
+{% load static %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
+
+{% block extra_head %}
+	<link rel="stylesheet" href="{% static 'service_desk/css/tom-select.bootstrap5.min.css' %}">
+{% endblock extra_head %}
 
 {% block content %}
 	<div class="d-flex align-items-center gap-3 mb-3">
@@ -7,52 +14,86 @@
 	</div>
 	<hr class="opacity-25">
 
-	<!-- Horní část - dvě sloupce -->
+
 	<div class="row g-3 mb-3">
-		<!-- Levý sloupec - Ticket entry -->
-		<div class="col-7">
-			<div class="card h-100">
-				<div class="card-header">Ticket entry</div>
-				<div class="card-body">
-					<div class="mb-2">
-						<strong>Subject:</strong> {{ ticket.subject }}
-					</div>
-					<div class="row mb-2">
-						<div class="col">
-							<strong>Company:</strong> {{ ticket.company }}
-						</div>
-						<div class="col">
-							<strong>Status:</strong> {{ ticket.get_status_display }}
-						</div>
-					</div>
-					<div>
-						<strong>Description:</strong>
-						<p>{{ ticket.description }}</p>
-					</div>
-				</div>
-			</div>
-		</div>
+    <div class="col-7">
+        <div class="card h-100">
+            <div class="card-header">Ticket entry</div>
+            <div class="card-body ticket-entry-form">
+                <form action="{{ request.path }}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% crispy ticket_entry %}
+                </form>
+            </div>
+        </div>
+    </div>
 
-		<!-- Pravý sloupec - Attachments -->
-		<div class="col-5">
-			<div class="card h-100">
-				<div class="card-header">Attachments</div>
-				<div class="card-body">
-					{% if ticket.attachments.all %}
-						{% for attachment in ticket.attachments.all %}
-							<div>{{ attachment.original_name }}</div>
-						{% endfor %}
-					{% else %}
-						<p class="text-muted text-center">List of provided attachments</p>
-					{% endif %}
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="col-5 d-flex flex-column gap-3">
 
-	<!-- Dolní část - Records / History -->
+        <!-- Attachments -->
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">Attachments
+{#                <button class="btn btn-sm btn-primary add-ticket">+</button>#}
+            </div>
+            <div class="card-body">
+                {% if ticket.attachments.all %}
+                    {% for attachment in ticket.attachments.all %}
+                        {% with attachment.original_name|lower as name %}
+                            {% if '.jpg' in name or '.jpeg' in name or '.png' in name or '.gif' in name or '.webp' in name %}
+                                <button type="button" class="btn btn-sm btn-outline-primary mb-1"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#attachmentModal{{ forloop.counter }}">
+                                    <span class="material-symbols-outlined">attach_file</span>
+                                    {{ attachment.original_name }}
+                                </button>
+                            {% else %}
+                                <a href="{{ attachment.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary mb-1">
+                                    <span class="material-symbols-outlined">attach_file</span>
+                                    {{ attachment.original_name }}
+                                </a>
+                            {% endif %}
+                        {% endwith %}
+
+                        {% with attachment.original_name|lower as name %}
+                            {% if '.jpg' in name or '.jpeg' in name or '.png' in name or '.gif' in name or '.webp' in name %}
+                                <div class="modal fade" id="attachmentModal{{ forloop.counter }}" tabindex="-1">
+                                    <div class="modal-dialog modal-xl modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">{{ attachment.original_name }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body text-center">
+                                                <img src="{{ attachment.file.url }}" class="img-fluid">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">There is no attachments</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Followers -->
+        <div class="card h-50">
+            <div class="card-header">Followers</div>
+            <div class="card-body">
+				<form action="{{ request.path }}" method="post" enctype="multipart/form-data">
+					{% csrf_token %}
+					{% crispy followers %}
+				</form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 	<div class="card">
-		<div class="card-header">
+		<div class="card-header d-flex justify-content-between align-items-center">
 			<ul class="nav nav-tabs card-header-tabs">
 				<li class="nav-item">
 					<a class="nav-link active" href="#">Records</a>
@@ -65,54 +106,11 @@
 		<div class="card-body" style="min-height: 200px;">
 			<p class="text-muted text-center">List of records or history</p>
 		</div>
-</div>
-
-
-{#	<h2>{{ ticket.ticket_number }}</h2>#}
-{#	<p>{{ ticket.company }}</p>#}
-{#	<p>{{ ticket.user }}</p>#}
-{#	<h2>{{ ticket.subject }}</h2>#}
-{#	<p>{{ ticket.description }}</p>#}
-
-{% if ticket.attachments.all %}
-    <h5>Attachments</h5>
-    {% for attachment in ticket.attachments.all %}
-
-		{% with attachment.original_name|lower as name %}
-			{% if '.jpg' in name or '.jpeg' in name or '.png' in name or '.gif' in name or '.webp' in name %}
-				<button type="button" class="btn btn-sm btn-outline-primary mb-1"
-						data-bs-toggle="modal"
-						data-bs-target="#attachmentModal{{ forloop.counter }}">
-					<span class="material-symbols-outlined">attach_file</span>
-					{{ attachment.original_name }}
-				</button>
-			{% else %}
-				<a href="{{ attachment.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary mb-1">
-					<span class="material-symbols-outlined">attach_file</span>
-					{{ attachment.original_name }}
-				</a>
-			{% endif %}
-		{% endwith %}
-
-		{% with attachment.original_name|lower as name %}
-			{% if '.jpg' in name or '.jpeg' in name or '.png' in name or '.gif' in name or '.webp' in name %}
-				<div class="modal fade" id="attachmentModal{{ forloop.counter }}" tabindex="-1">
-					<div class="modal-dialog modal-xl modal-dialog-centered">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h5 class="modal-title">{{ attachment.original_name }}</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-							</div>
-							<div class="modal-body text-center">
-								<img src="{{ attachment.file.url }}" class="img-fluid">
-							</div>
-						</div>
-					</div>
-				</div>
-			{% endif %}
-		{% endwith %}
-
-    {% endfor %}
-{% endif %}
+	</div>
 
 {% endblock content %}
+
+{% block extra_js %}
+	<script src="{% static 'service_desk/js/tom-select.complete.min.js' %}"></script>
+	<script src="{% static 'service_desk/js/tom-select-init.js' %}"></script>
+{% endblock extra_js %}

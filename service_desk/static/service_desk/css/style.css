@@ -105,6 +105,21 @@ body {
     margin-bottom: 8px !important;
 }
 
+.ticket-entry-form .form-control,
+.ticket-entry-form .form-select {
+    font-size: 14px;
+    padding: 4px 8px;
+}
+
+.ticket-entry-form .form-label {
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.ticket-entry-form .mb-3 {
+    margin-bottom: 8px !important;
+}
+
 
 /* Sidebar a offcanvas backgroud */
 .bg-dark {
@@ -173,4 +188,8 @@ body {
 .user-profile-mail {
     font-size: 13px;
     color: #bcbfbf;
+}
+
+.ts-wrapper.has-items .ts-control input::placeholder {
+    color: transparent;
 }
