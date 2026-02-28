@@ -4,7 +4,6 @@ from service_desk import views
 app_name = 'service_desk'
 
 urlpatterns = [
-    path('ticket-list/', views.ticket_list, name='ticket-list'),
     path('', views.default_view),  # default_view - redirect to login or dashboard
     path('dashboard/', views.dashboard_view, name='dashboard'),  # dashboard_view
     path('tickets/', views.tickets_view, name='tickets'),  # tickets_view
