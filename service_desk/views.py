@@ -52,9 +52,9 @@ def tickets_view(request):
 
     for ticket in tickets_page:
         is_participant = (
-            ticket.user.id == request.user.id or
-            ticket.assigned_to.id == request.user.id or
-            ticket.id in user_followed_ids
+                ticket.user.id == request.user.id or
+                (ticket.assigned_to and ticket.assigned_to.id == request.user.id) or
+                ticket.id in user_followed_ids
         )
 
         if is_participant and (ticket.pk not in read_statuses or ticket.last_update > read_statuses[ticket.pk]):
