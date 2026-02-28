@@ -8,11 +8,6 @@ from service_desk.forms import TicketForm, TicketAttachmentForm
 from django.core.paginator import Paginator
 from .tables import TicketTable
 
-def ticket_list(request):
-    all_tickets = Ticket.objects.all()
-    context = {'tickets': all_tickets}
-
-    return render(request, 'service_desk/ticket_list.html', context)
 
 @login_required
 def default_view(request):
@@ -49,12 +44,20 @@ def tickets_view(request):
 
     tickets_page = list(page.object_list)
 
+    user_followed_ids = set(request.user.followed_tickets.values_list('id', flat=True))
+
     read_statuses = dict(
         TicketReadStatus.objects.filter(
             user=request.user).values_list('ticket_id', 'last_read_at'))
 
     for ticket in tickets_page:
-        if ticket.pk not in read_statuses or ticket.last_update > read_statuses[ticket.pk]:
+        is_participant = (
+            ticket.user.id == request.user.id or
+            ticket.assigned_to.id == request.user.id or
+            ticket.id in user_followed_ids
+        )
+
+        if is_participant and (ticket.pk not in read_statuses or ticket.last_update > read_statuses[ticket.pk]):
             ticket.is_unread = True
         else:
             ticket.is_unread = False
@@ -70,6 +73,7 @@ def tickets_view(request):
     }
 
     return render(request, 'service_desk/tickets.html', context)
+
 
 
 @login_required
