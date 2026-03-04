@@ -193,3 +193,20 @@ body {
 .ts-wrapper.has-items .ts-control input::placeholder {
     color: transparent;
 }
+
+.ts-control {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: hidden;
+    align-items: center;
+}
+
+.ts-control .item {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.ts-control input {
+    flex: 1 1 auto !important;
+    min-width: 1rem !important;
+}
