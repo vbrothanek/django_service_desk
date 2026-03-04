@@ -1,0 +1,17 @@
+{% load static %}
+
+{% for ticket in data %}
+    <div class="d-flex">
+        {{ ticket.ticket_number }} - {{ ticket.company__name }}
+    </div>
+{% endfor %}
+
+{% if next %}
+<button class="btn btn-primary"
+    hx-get="{{ next }}"
+    hx-target="#ticket-list-dashboard"
+    hx-swap="beforeend"
+    hx-on::after-request="this.remove()">
+    Načíst další
+</button>
+{% endif %}

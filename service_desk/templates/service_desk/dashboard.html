@@ -1,6 +1,20 @@
 {% extends 'service_desk/_base.html' %}
+{% load static %}
 
 {% block content %}
-<h1>Dashboard</h1>
+	<h1>Dashboard</h1>
+	<div id="ticket-list-dashboard">
+		{% include 'service_desk/include/dashboard_htmx.html' with data=data next=next %}
+	</div>
+{#	<button type="submit" name="action" value="fetch" id="btn-fetch" class="btn btn-primary">Fetch JS</button>#}
+
+{#	<button class="btn btn-primary" hx-get="/api-htmx/" hx-target="#ticket-list-dashboard">Fetch HTMX</button>#}
+
+
 
 {% endblock content %}
+
+
+{% block extra_js %}
+	<script defer src="{% static 'service_desk/js/fetch.js' %}"></script>
+{% endblock %}
