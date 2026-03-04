@@ -22,7 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelectorAll('select.tom-select-status-ticket-detail').forEach(select => {
         new TomSelect(select, {
-            allowEmptyOption: true,
+            allowEmptyOption: false,
+            controlInput: null,
         })
     })
 
@@ -31,6 +32,15 @@ document.addEventListener("DOMContentLoaded", () => {
             allowEmptyOption: true,
             plugins: ['remove_button'],
             hideSelected: true,
+        })
+    })
+
+    document.querySelectorAll('select.tom-select-assigned-ticket-detail').forEach(select => {
+        new TomSelect(select, {
+            allowEmptyOption: false,
+            maxItems: 1,
+            // controlInput: null,
+            placeholder: 'Select assignee...',
         })
     })
 })
