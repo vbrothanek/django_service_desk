@@ -9,6 +9,8 @@ urlpatterns = [
     path('tickets/', views.tickets_view, name='tickets'),  # tickets_view
     path('tickets/create/', views.create_ticket_view, name='new_ticket'),  # create_ticket_view
     path('tickets/<int:ticket_number>', views.ticket_detail_view, name='ticket_detail'), #ticket_detail_view
+    path('api/',views.api_json, name='api_json'), #API test
+    path('api-htmx/',views.api_htmx, name='api_htmx'), #API HTMX
     # path('settings/', test_view),
     # path('settings/users/', test_view),
     # path('settings/users/add/', test_view),
