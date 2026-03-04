@@ -18,6 +18,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+
+    //Autosave function - after file is uploaded do submit automatically instead of saving form manually.
+    const upload_file = document.getElementById('id_file');
+    const upload_form = document.getElementById('attachment-upload-form');
+
+    upload_file.addEventListener('change', () => {
+        upload_form.submit();
+    });
 })
 
 
