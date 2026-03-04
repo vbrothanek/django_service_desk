@@ -1,4 +1,5 @@
 from django.db.models import OuterRef, Subquery, DateTimeField
+from django.http import JsonResponse
 from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django_tables2 import RequestConfig
@@ -16,8 +17,61 @@ def default_view(request):
 
 @login_required
 def dashboard_view(request):
-    context = {'active_page': 'dashboard'}
+    per_fetch = 5
+    data = Ticket.objects.values('company', 'company__name', 'ticket_number', 'assigned_to', 'user')
+    data = list(data[:per_fetch])
+
+    next_url = f'/api-htmx/?startFrom={per_fetch}' if len(data) == per_fetch else None
+
+    context = {
+        'active_page': 'dashboard',
+        'data': data,
+        'next': next_url
+    }
     return render(request, 'service_desk/dashboard.html', context)
+
+
+@login_required
+def api_json(request):
+    per_fetch = 5
+
+    start_from = int(request.GET.get('startFrom') or 0)
+    until = start_from + per_fetch
+
+    data = Ticket.objects.values('company', 'company__name', 'ticket_number', 'assigned_to', 'user')
+    data = list(data[start_from:until])
+
+    if len(data) < per_fetch:
+        next_url = None
+    else:
+        next_url = f'/api/?startFrom={str(until)}'
+
+    return JsonResponse({
+        'data': data,
+        'next': next_url
+    })
+
+@login_required
+def api_htmx(request):
+    per_fetch = 5
+
+    start_from = int(request.GET.get('startFrom') or 0)
+    until = start_from + per_fetch
+
+    data = Ticket.objects.values('company', 'company__name', 'ticket_number', 'assigned_to', 'user')
+    data = list(data[start_from:until])
+
+    if len(data) < per_fetch:
+        next_url = None
+    else:
+        next_url = f'/api-htmx/?startFrom={str(until)}'
+
+    print(next_url)
+
+    return render(request, 'service_desk/include/dashboard_htmx.html', {
+        'data': data,
+        'next': next_url
+    })
 
 
 @login_required
@@ -52,9 +106,9 @@ def tickets_view(request):
 
     for ticket in tickets_page:
         is_participant = (
-                ticket.user.id == request.user.id or
-                (ticket.assigned_to and ticket.assigned_to.id == request.user.id) or
-                ticket.id in user_followed_ids
+                ticket.user.id == request.user.id or                                    # Check if user is the ticket creator
+                (ticket.assigned_to and ticket.assigned_to.id == request.user.id) or    # Check if ticket is assigned to user (assigned_to can be None)
+                ticket.id in user_followed_ids                                          # Check if user is following the ticket
         )
 
         if is_participant and (ticket.pk not in read_statuses or ticket.last_update > read_statuses[ticket.pk]):
@@ -130,6 +184,45 @@ def create_ticket_view(request):
 def ticket_detail_view(request, ticket_number):
     ticket = get_object_or_404(Ticket, ticket_number=ticket_number)
 
+    if request.method == 'POST':
+        form_type = request.POST.get('form_type')
+
+        # Initialize all forms with instance defaults to ensure context is always complete,
+        # regardless of which form was submitted or whether validation failed.
+        form = TicketDetailForm(instance=ticket)
+        form_followers = TicketDetailFollowersForm(instance=ticket)
+        attachment_form = TicketAttachmentForm()
+
+        if form_type == 'ticket':
+            form = TicketDetailForm(request.POST, instance=ticket)
+            form_followers = TicketDetailFollowersForm(request.POST, instance=ticket)
+
+            if form.is_valid() and form_followers.is_valid():
+                form.save()
+                form_followers.save()
+
+                return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
+
+        elif form_type == 'attachments':
+            attachment_form = TicketAttachmentForm(request.POST, request.FILES)
+
+            if attachment_form.is_valid():
+                for file in attachment_form.cleaned_data['file']:
+                    TicketAttachment.objects.create(
+                        ticket=ticket,
+                        file=file,
+                        original_name=file.name,
+                        uploaded_by=request.user
+                    )
+
+                return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
+
+    else:
+        form = TicketDetailForm(instance=ticket)
+        form_followers = TicketDetailFollowersForm(instance=ticket)
+        attachment_form = TicketAttachmentForm()
+
+
     #Update Read Status when user involved in ticket opened the ticket.
     TicketReadStatus.objects.update_or_create(
         ticket = ticket,
@@ -139,12 +232,10 @@ def ticket_detail_view(request, ticket_number):
         }
     )
 
-    form = TicketDetailForm(instance=ticket)
-    form_followers = TicketDetailFollowersForm(instance=ticket)
-
     context = {'ticket': ticket,
                'ticket_entry': form,
                'followers': form_followers,
+               'attachment_form': attachment_form,
                'active_page': 'tickets'}
 
     return render(request, 'service_desk/ticket_detail.html', context)
