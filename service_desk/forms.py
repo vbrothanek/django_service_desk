@@ -23,11 +23,11 @@ class TicketForm(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
-                Column('company', css_class='col-4'),
-                Column('priority', css_class='col-2')),
-            Row(Column('subject', css_class='col-6')),
-            Row(Column('description', css_class='col-6')),
-            Row(Column('due_date', css_class='col-2')),
+                Column('company', css_class='col-12 col-lg-4'),
+                Column('priority', css_class='col-12 col-lg-2')),
+            Row(Column('subject', css_class='col-12 col-lg-6')),
+            Row(Column('description', css_class='col-12 col-lg-6')),
+            Row(Column('due_date', css_class='col-12 col-lg-2')),
             )
 
 
@@ -63,7 +63,7 @@ class TicketAttachmentForm(forms.Form):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
-                Column('file', css_class='col-3 pb-3'),
+                Column('file', css_class='col-12 col-lg-3 pb-3'),
             )
         )
 
@@ -81,17 +81,19 @@ class TicketAttachmentForm(forms.Form):
 class TicketDetailForm(forms.ModelForm):
     class Meta:
         model = Ticket
-        fields = ['company', 'subject', 'description', 'priority', 'due_date', 'status']
+        fields = ['company', 'subject', 'description', 'priority', 'due_date', 'status', 'assigned_to']
         widgets = {
             'due_date': forms.DateInput(attrs={'type': 'date'}),
             'company': forms.Select(attrs={'class': 'tom-select-company-ticket-detail', 'placeholder': 'Select company...'}),
             'priority': forms.Select(attrs={'class': 'tom-select-priority'}),
-            'status': forms.Select(attrs={'class': 'tom-select-status-ticket-detail'})
+            'status': forms.Select(attrs={'class': 'tom-select-status-ticket-detail'}),
+            'assigned_to': forms.Select(attrs={'class': 'tom-select-assigned-ticket-detail'})
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['company'].empty_label = ''
+        self.fields['assigned_to'].empty_label = ''
         self.fields['subject'].widget.attrs['disabled'] = True
         self.fields['subject'].required = False
 
@@ -102,11 +104,12 @@ class TicketDetailForm(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
-                Column('company', css_class='col-4'),
+                Column('company', css_class='col-12 col-lg-4'),
                 Column('due_date'),
                 Column('priority'),
                 Column('status')),
-            Row(Column('subject')),
+            Row(Column('subject'),
+                Column('assigned_to', css_class='col-12 col-lg-3')),
             Row(Column('description'))
             )
 
