@@ -15,18 +15,40 @@
 	<hr class="opacity-25">
 
 	<div class="row mb-3">
-		<div class="d-flex justify-content-end align-items-center">
+		<div class="d-flex justify-content-end align-items-center gap-3">
 			<button form="ticket-detail-form" class="btn btn-primary" id="save-button" type="submit" disabled>Save</button>
+				<div class="dropdown ">
+					<button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+						New
+					</button>
+					<ul class="dropdown-menu">
+						<li>
+							<label class="dropdown-item d-flex align-items-center" for="id_file" style="cursor: pointer;">
+								<span class="material-symbols-outlined">attach_file_add</span>
+								<span class="ms-2">Attachment</span>
+							</label>
+							<input type="file" id="file-upload" class="d-none">
+						</li>
+						<li>
+							<a class="dropdown-item d-flex align-items-center" href="#">
+								<span class="material-symbols-outlined">add_notes</span>
+								<span class="ms-2">Record</span>
+							</a>
+						</li>
+					</ul>
+				</div>
 		</div>
 	</div>
+
 	<form id="ticket-detail-form" action="{{ request.path }}" method="post" enctype="multipart/form-data">
 		<div class="row g-3 mb-3">
 
 			<div class="col-12 col-lg-7">
 				<div class="card h-100">
-					<div class="card-header">Ticket entry</div>
+					<div class="card-header fw-medium">Ticket entry</div>
 					<div class="card-body ticket-entry-form">
 						{% csrf_token %}
+						<input type="hidden" name="form_type" value="ticket">
 						{% crispy ticket_entry %}
 					</div>
 				</div>
@@ -36,53 +58,60 @@
 
 				<!-- Attachments -->
 				<div class="card h-100">
-					<div class="card-header d-flex justify-content-end align-items-center">Attachments</div>
-					<div class="card-body">
-						{% if ticket.attachments.all %}
-							{% for attachment in ticket.attachments.all %}
-								{% with attachment.original_name|lower as name %}
-									{% if '.jpg' in name or '.jpeg' in name or '.png' in name or '.gif' in name or '.webp' in name %}
-										<button type="button" class="btn btn-sm btn-outline-primary mb-1"
-												data-bs-toggle="modal"
-												data-bs-target="#attachmentModal{{ forloop.counter }}">
-											<span class="material-symbols-outlined">attach_file</span>
-											{{ attachment.original_name }}
-										</button>
-									{% else %}
-										<a href="{{ attachment.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary mb-1">
-											<span class="material-symbols-outlined">attach_file</span>
-											{{ attachment.original_name }}
-										</a>
-									{% endif %}
-								{% endwith %}
+					<div class="card-header fw-medium">Attachments</div>
+					<div class="card-body px-3 py-1">
 
-								{% with attachment.original_name|lower as name %}
-									{% if '.jpg' in name or '.jpeg' in name or '.png' in name or '.gif' in name or '.webp' in name %}
-										<div class="modal fade" id="attachmentModal{{ forloop.counter }}" tabindex="-1">
-											<div class="modal-dialog modal-xl modal-dialog-centered">
-												<div class="modal-content">
-													<div class="modal-header">
-														<h5 class="modal-title">{{ attachment.original_name }}</h5>
-														<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-													</div>
-													<div class="modal-body text-center">
-														<img src="{{ attachment.file.url }}" class="img-fluid">
+						{% if ticket.attachments.all %}
+							<table class="table table-sm table-hover mb-0">
+								<tbody>
+									{% for attachment in ticket.attachments.all %}
+										{% with attachment.original_name|lower as name %}
+										<tr>
+											<td>
+												{% if '.jpg' in name or '.jpeg' in name or '.png' in name or '.gif' in name or '.webp' in name %}
+													<button type="button" class="btn btn-link btn-sm p-0 ticket-attachment-row text-decoration-none"
+															data-bs-toggle="modal"
+															data-bs-target="#attachmentModal{{ forloop.counter }}">
+														{{ attachment.original_name }}
+													</button>
+												{% else %}
+													<a href="{{ attachment.file.url }}" target="_blank" class="small text-decoration-none">{{ attachment.original_name }}</a>
+												{% endif %}
+											</td>
+											<td class="text-muted small text-end text-nowrap">{{ attachment.uploaded_at|date:"d.m.Y H:i" }}</td>
+										</tr>
+										{% endwith %}
+
+										{% with attachment.original_name|lower as name %}
+											{% if '.jpg' in name or '.jpeg' in name or '.png' in name or '.gif' in name or '.webp' in name %}
+												<div class="modal fade" id="attachmentModal{{ forloop.counter }}" tabindex="-1">
+													<div class="modal-dialog modal-xl modal-dialog-centered">
+														<div class="modal-content">
+															<div class="modal-header">
+																<h5 class="modal-title">{{ attachment.original_name }}</h5>
+																<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+															</div>
+															<div class="modal-body text-center">
+																<img src="{{ attachment.file.url }}" class="img-fluid">
+															</div>
+														</div>
 													</div>
 												</div>
-											</div>
-										</div>
-									{% endif %}
-								{% endwith %}
-							{% endfor %}
+											{% endif %}
+										{% endwith %}
+									{% endfor %}
+								</tbody>
+							</table>
 						{% else %}
-							<p class="text-muted text-center">There is no attachments</p>
+							<p class="text-muted text-center p-3">There is no attachments</p>
 						{% endif %}
+
 					</div>
 				</div>
 
 				<!-- Followers -->
 				<div class="card h-50">
-					<div class="card-header">Followers</div>
+					<div class="card-header fw-medium">Followers</div>
 					<div class="card-body ticket-entry-form">
 						{% csrf_token %}
 						{% crispy followers %}
@@ -92,6 +121,18 @@
 		</div>
 	</form>
 
+	<!-- Hided form for uploading attachments from ticket detail -->
+	<form id="attachment-upload-form" action="{{ request.path }}" method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+		<input type="hidden" name="form_type" value="attachments">
+		<div class="d-none">
+			{% crispy attachment_form %}
+		</div>
+	</form>
+
+
+
+	<!-- Must be edited -->
 	<div class="card">
 		<div class="card-header d-flex justify-content-between align-items-center">
 			<ul class="nav nav-tabs card-header-tabs">
@@ -111,7 +152,7 @@
 {% endblock content %}
 
 {% block extra_js %}
-	<script src="{% static 'service_desk/js/tom-select.complete.min.js' %}"></script>
-	<script src="{% static 'service_desk/js/tom-select-init.js' %}"></script>
-	<script src="{% static 'service_desk/js/ticket-detail-save-btn.js' %}"></script>
+	<script defer src="{% static 'service_desk/js/tom-select.complete.min.js' %}"></script>
+	<script defer src="{% static 'service_desk/js/tom-select-init.js' %}"></script>
+	<script defer src="{% static 'service_desk/js/ticket-detail-save-btn.js' %}"></script>
 {% endblock extra_js %}
