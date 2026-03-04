@@ -114,7 +114,8 @@
 		</div>
 	</div>
 
-    <script src="{% static 'service_desk/js/bootstrap.bundle.min.js' %}"></script>
+    <script defer src="{% static 'service_desk/js/bootstrap.bundle.min.js' %}"></script>
+	<script defer src="{% static 'service_desk/js/htmx.min.js' %}"></script>
     {% block extra_js %}{% endblock %}
 
   </body>
