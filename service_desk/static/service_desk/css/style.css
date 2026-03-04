@@ -93,7 +93,7 @@ body {
 .create-ticket-form .form-control,
 .create-ticket-form .form-select {
     font-size: 14px;
-    padding: 4px 8px;
+    padding: 6px 8px;
 }
 
 .create-ticket-form .form-label {
@@ -108,7 +108,7 @@ body {
 .ticket-entry-form .form-control,
 .ticket-entry-form .form-select {
     font-size: 14px;
-    padding: 4px 8px;
+    padding: 6px 8px;
 }
 
 .ticket-entry-form .form-label {

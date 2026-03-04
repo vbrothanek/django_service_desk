@@ -94,8 +94,9 @@ class TicketDetailForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['company'].empty_label = ''
         self.fields['assigned_to'].empty_label = ''
-        self.fields['subject'].widget.attrs['disabled'] = True
-        self.fields['subject'].required = False
+        self.fields['subject'].widget.attrs['readonly'] = True
+        self.fields['subject'].widget.attrs['class'] = 'form-control-plaintext bg-light px-2 rounded border detail-view-subject'
+        # self.fields['subject'].required = False
 
         if self.instance and self.instance.pk:
             self.fields['subject'].initial = self.instance.subject
@@ -109,7 +110,7 @@ class TicketDetailForm(forms.ModelForm):
                 Column('priority'),
                 Column('status')),
             Row(Column('subject'),
-                Column('assigned_to', css_class='col-12 col-lg-3')),
+                Column('assigned_to', css_class='col-12 col-lg-3'), css_class='row align-items-end'),
             Row(Column('description'))
             )
 
