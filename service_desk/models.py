@@ -103,6 +103,7 @@ class Record(models.Model):
     user = models.ForeignKey(User, related_name='ticket_records', on_delete=models.PROTECT)
     message = models.TextField(max_length=5000)
     created_at = models.DateTimeField(auto_now_add=True)
+    last_update = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = 'Record'
