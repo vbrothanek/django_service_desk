@@ -95,8 +95,7 @@ class TicketDetailForm(forms.ModelForm):
         self.fields['company'].empty_label = ''
         self.fields['assigned_to'].empty_label = ''
         self.fields['subject'].widget.attrs['readonly'] = True
-        self.fields['subject'].widget.attrs['class'] = 'form-control-plaintext bg-light px-2 rounded border detail-view-subject'
-        # self.fields['subject'].required = False
+        self.fields['subject'].widget.attrs['class'] = 'form-control-plaintext bg-light px-2 border detail-view-subject'
 
         if self.instance and self.instance.pk:
             self.fields['subject'].initial = self.instance.subject
@@ -114,6 +113,7 @@ class TicketDetailForm(forms.ModelForm):
             Row(Column('description'))
             )
 
+
 class TicketDetailFollowersForm(forms.ModelForm):
     class Meta:
         model = Ticket
@@ -125,4 +125,28 @@ class TicketDetailFollowersForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['followers'].label = False
+
+
+class NewRecordForm(forms.ModelForm):
+    class Meta:
+        model = Record
+        fields = ['user', 'message']
+        widgets = {
+            'message': forms.Textarea(attrs={'placeholder': 'Message...'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['user'].widget.attrs['style'] = 'pointer-events: none;'
+        self.fields['user'].widget.attrs['tabindex'] = '-1'
+        self.fields['user'].widget.attrs['class'] = 'form-control-plaintext bg-light px-2 border'
+        # self.fields['user'].widget.attrs['readonly'] = True
+        # self.fields['user'].widget.attrs['class'] = 'form-control-plaintext bg-light px-2 border'
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(Column('user', css_class='col-12 col-lg-4 pb-1'),),
+            Row(Column('message')),
+        )
 
