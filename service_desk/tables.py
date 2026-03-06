@@ -1,5 +1,5 @@
 from django_tables2 import Table
-from .models import Ticket
+from .models import Ticket, Record
 from django.utils.html import format_html
 from django.urls import reverse
 
@@ -75,3 +75,35 @@ class TicketTable(Table):
 
     def render_created_at(self, value, record):
         return value.strftime('%d.%m.%Y %H:%M')
+
+
+class RecordTable(Table):
+    class Meta:
+        model = Record
+        template_name = "django_tables2/bootstrap5.html"
+        fields = ['message', 'user', 'created_at']
+        attrs = {
+            "class": "table table-sm table-hover records-table",
+        }
+        column_attrs = {
+            'message': {'style': 'width: 60%;'},
+            'user': {'style': 'width: 25%;'},
+            'created_at': {'style': 'width: 15%;'},
+        }
+
+    def render_created_at(self, value, record):
+        return value.strftime('%d.%m.%Y %H:%M')
+
+
+    def render_message(self, value, record):
+        return format_html(
+            '<div id="record-{}" '
+            'style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" '
+            'onclick="this.style.whiteSpace = this.style.whiteSpace === \'normal\' ? \'nowrap\' : \'normal\'">'
+            '{}'
+            '</div>',
+            record.pk, value
+        )
+
+    def render_user(self, value, record):
+        return format_html('<span title="{}">{}</span>', value.username, value.get_full_name())
