@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from service_desk.forms import TicketForm, TicketAttachmentForm, TicketDetailForm, TicketDetailFollowersForm, \
     NewRecordForm
 from django.core.paginator import Paginator
-from .tables import TicketTable
+from .tables import TicketTable, RecordTable
 
 
 @login_required
@@ -117,13 +117,13 @@ def tickets_view(request):
         else:
             ticket.is_unread = False
 
-    table = TicketTable(tickets_page, order_by=sort)
-    RequestConfig(request, paginate=False).configure(table)
+    tickets_table = TicketTable(tickets_page, order_by=sort)
+    RequestConfig(request, paginate=False).configure(tickets_table)
 
     context = {
         'active_page': 'tickets',
-        'table': table,
-        'page': page,
+        'tickets_table': tickets_table,
+        'page': page, # tickets
         'page_range': page_range,
     }
 
@@ -183,7 +183,8 @@ def create_ticket_view(request):
 
 @login_required
 def ticket_detail_view(request, ticket_number):
-    ticket = get_object_or_404(Ticket, ticket_number=ticket_number)
+    ticket = get_object_or_404(Ticket.objects.select_related('assigned_to', 'user', 'company'),
+                               ticket_number=ticket_number)
 
     form = TicketDetailForm(instance=ticket)
     form_followers = TicketDetailFollowersForm(instance=ticket)
@@ -238,15 +239,34 @@ def ticket_detail_view(request, ticket_number):
         }
     )
 
-    records = Record.objects.filter(ticket_id=ticket.pk)
+    records_sorting = request.GET.get('sort', '-created_at')
+    records = Record.objects.filter(ticket_id=ticket.pk).select_related('user').order_by(records_sorting)
+
+    # Pagination
+    page_number = request.GET.get('page', 1)
+    per_page = request.GET.get('per_page', 15)
+    paginator = Paginator(records, per_page=per_page)
+    page = paginator.get_page(page_number)
+    page_range = paginator.get_elided_page_range(page_number, on_each_side=2, on_ends=1)
+
+    records_page = list(page.object_list)
+
+    records_table = RecordTable(records_page, order_by=records_sorting)
+    RequestConfig(request, paginate=False).configure(records_table)
 
     context = {'ticket': ticket,
                'ticket_entry': form,
                'followers': form_followers,
                'attachment_form': attachment_form,
                'record_form': record_form,
-               'records': records,
+               'records_table': records_table,
+               'page': page,  # records
+               'page_range': page_range,
+               'per_page': per_page,
                'active_page': 'tickets'}
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'service_desk/include/records_table.html', context)
 
     return render(request, 'service_desk/ticket_detail.html', context)
 
