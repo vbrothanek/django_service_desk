@@ -38,12 +38,14 @@ body {
     display: none;
 }
 
-/* Tickets table styles starts */
-.tickets-table {
+/* Tickets & Records table styles starts */
+.tickets-table,
+.records-table {
     font-size: 14px;
 }
 
-.tickets-table thead tr th{
+.tickets-table thead tr th,
+.records-table thead tr th {
     background-color: #0F4C75;
 }
 
@@ -52,12 +54,13 @@ body {
     color: #0F4C75;
 }
 
-
-.tickets-table thead th{
+.tickets-table thead th,
+.records-table thead th {
     padding: 8px 12px;
 }
 
-.tickets-table thead tr th > a{
+.tickets-table thead tr th > a,
+.records-table thead tr th > a {
     color: white;
 }
 
@@ -68,7 +71,8 @@ body {
     text-decoration: none;
 }
 
-.tickets-table thead th.orderable a::after {
+.tickets-table thead th.orderable a::after,
+.records-table thead th.orderable a::after {
     font-family: 'Material Symbols Outlined';
     content: 'unfold_more';
     opacity: 0.4;
@@ -76,20 +80,22 @@ body {
     font-size: 16px;
 }
 
-.tickets-table thead th.asc a::after {
+.tickets-table thead th.asc a::after,
+.records-table thead th.asc a::after {
     font-family: 'Material Symbols Outlined';
     content: 'keyboard_arrow_up';
     opacity: 1;
     float: right;
 }
 
-.tickets-table thead th.desc a::after {
+.tickets-table thead th.desc a::after,
+.records-table thead th.desc a::after {
     font-family: 'Material Symbols Outlined';
     content: 'keyboard_arrow_down';
     opacity: 1;
     float: right;
 }
-/* Tickets table styles ends*/
+/* Tickets & Records table styles ends*/
 
 .create-ticket-form .form-control,
 .create-ticket-form .form-select {
@@ -210,4 +216,30 @@ body {
 .ts-control input {
     flex: 1 1 auto !important;
     min-width: 1rem !important;
+}
+
+.records-table th:nth-child(1),
+.records-table td:nth-child(1) {
+    width: 60%;
+}
+
+.records-table th:nth-child(2),
+.records-table td:nth-child(2) {
+    width: 25%;
+}
+
+.records-table th:nth-child(3),
+.records-table td:nth-child(3) {
+    width: 15%;
+}
+
+.records-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.records-table td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
