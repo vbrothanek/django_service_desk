@@ -3,9 +3,10 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django_tables2 import RequestConfig
-from .models import Ticket, Company, Record, TicketReadStatus, TicketAttachment
+from .models import Ticket, Company, Record, TicketReadStatus, TicketAttachment, StatusLevel
 from django.contrib.auth.decorators import login_required
-from service_desk.forms import TicketForm, TicketAttachmentForm, TicketDetailForm, TicketDetailFollowersForm
+from service_desk.forms import TicketForm, TicketAttachmentForm, TicketDetailForm, TicketDetailFollowersForm, \
+    NewRecordForm
 from django.core.paginator import Paginator
 from .tables import TicketTable
 
@@ -66,7 +67,6 @@ def api_htmx(request):
     else:
         next_url = f'/api-htmx/?startFrom={str(until)}'
 
-    print(next_url)
 
     return render(request, 'service_desk/include/dashboard_htmx.html', {
         'data': data,
@@ -111,7 +111,8 @@ def tickets_view(request):
                 ticket.id in user_followed_ids                                          # Check if user is following the ticket
         )
 
-        if is_participant and (ticket.pk not in read_statuses or ticket.last_update > read_statuses[ticket.pk]):
+        if (is_participant and (ticket.pk not in read_statuses or ticket.last_update > read_statuses[ticket.pk])) \
+                or (ticket.status == StatusLevel.NEW and ticket.assigned_to is None):
             ticket.is_unread = True
         else:
             ticket.is_unread = False
@@ -184,6 +185,11 @@ def create_ticket_view(request):
 def ticket_detail_view(request, ticket_number):
     ticket = get_object_or_404(Ticket, ticket_number=ticket_number)
 
+    form = TicketDetailForm(instance=ticket)
+    form_followers = TicketDetailFollowersForm(instance=ticket)
+    attachment_form = TicketAttachmentForm()
+    record_form = NewRecordForm(initial={'user': request.user})
+
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
@@ -198,7 +204,12 @@ def ticket_detail_view(request, ticket_number):
             form_followers = TicketDetailFollowersForm(request.POST, instance=ticket)
 
             if form.is_valid() and form_followers.is_valid():
-                form.save()
+                ticket = form.save(commit=False)
+
+                if 'status' in form.changed_data and form.cleaned_data['assigned_to'] is None:
+                    ticket.assigned_to = request.user
+
+                ticket.save()
                 form_followers.save()
 
                 return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
@@ -217,11 +228,6 @@ def ticket_detail_view(request, ticket_number):
 
                 return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
 
-    else:
-        form = TicketDetailForm(instance=ticket)
-        form_followers = TicketDetailFollowersForm(instance=ticket)
-        attachment_form = TicketAttachmentForm()
-
 
     #Update Read Status when user involved in ticket opened the ticket.
     TicketReadStatus.objects.update_or_create(
@@ -232,10 +238,34 @@ def ticket_detail_view(request, ticket_number):
         }
     )
 
+    records = Record.objects.filter(ticket_id=ticket.pk)
+
     context = {'ticket': ticket,
                'ticket_entry': form,
                'followers': form_followers,
                'attachment_form': attachment_form,
+               'record_form': record_form,
+               'records': records,
                'active_page': 'tickets'}
 
     return render(request, 'service_desk/ticket_detail.html', context)
+
+
+@login_required
+def record_create_view(request, ticket_number):
+    ticket = get_object_or_404(Ticket, ticket_number=ticket_number)
+
+    if request.method == 'POST':
+        form = NewRecordForm(request.POST)
+
+        if form.is_valid():
+            record = form.save(commit=False)
+            print(record.ticket_id, record.user, record.message)
+            record.ticket = ticket
+            record.user = request.user
+            record.save()
+
+            return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
+
+    return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
+
