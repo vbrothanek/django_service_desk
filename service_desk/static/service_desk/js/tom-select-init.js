@@ -43,5 +43,19 @@ document.addEventListener("DOMContentLoaded", () => {
             placeholder: 'Select assignee...',
         })
     })
+
+    document.querySelectorAll('select.tom-select-filter-status').forEach(select => {
+        new TomSelect(select, {
+            allowEmptyOption: true,
+            controlInput: null,
+        })
+    })
+
+    document.querySelectorAll('select.tom-select-filter-priority').forEach(select => {
+        new TomSelect(select, {
+            allowEmptyOption: true,
+            controlInput: null,
+        })
+    })
 })
 
