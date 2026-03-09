@@ -15,9 +15,9 @@
 		<h3 class="mb-0">Ticket #{{ ticket.ticket_number }} - {{ ticket.subject }}</h3>
 
 		<div class="d-flex justify-content-end align-items-center gap-3 ms-auto">
-			<button form="ticket-detail-form" class="btn btn-primary" id="save-button" type="submit" disabled>Save</button>
+			<button form="ticket-detail-form" class="btn btn-sm btn-primary" id="save-button" type="submit" disabled>Save</button>
 				<div class="dropdown ">
-					<button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+					<button class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">
 						New
 					</button>
 					<ul class="dropdown-menu">
@@ -30,7 +30,7 @@
 						</li>
 						<li>
 							<a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#add-new-record-modal">
-								<span class="material-symbols-outlined">add_notes</span>
+								<span class="material-symbols-outlined">add_comment</span>
 								<span class="ms-2">Record</span>
 							</a>
 						</li>
