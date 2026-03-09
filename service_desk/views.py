@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django_tables2 import RequestConfig
+from .filters import TicketFilter
 from .models import Ticket, Company, Record, TicketReadStatus, TicketAttachment, StatusLevel
 from django.contrib.auth.decorators import login_required
 from service_desk.forms import TicketForm, TicketAttachmentForm, TicketDetailForm, TicketDetailFollowersForm, \
@@ -85,6 +86,10 @@ def tickets_view(request):
             company__in=request.user.companies.all()
         )
 
+    # ticket filters
+    ticket_filter = TicketFilter(request.GET, queryset=tickets)
+    tickets = ticket_filter.qs
+
     # Sorting before pagination
     sort = request.GET.get('sort', '-last_update')
     tickets = tickets.order_by(sort)
@@ -123,6 +128,7 @@ def tickets_view(request):
     context = {
         'active_page': 'tickets',
         'tickets_table': tickets_table,
+        'filter': ticket_filter,
         'page': page, # tickets
         'page_range': page_range,
     }
