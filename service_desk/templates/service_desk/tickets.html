@@ -1,10 +1,42 @@
 {% extends 'service_desk/_base.html' %}
 {% load url_helpers %}
 {% load django_tables2 %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'service_desk/css/tom-select.bootstrap5.min.css' %}">
+{% endblock extra_head %}
 
 {% block content %}
-	<h3>Tickets</h3>
+	<div class="d-flex align-items-center gap-3 mb-3">
+		<h3 class="mb-0">Tickets</h3>
+		<div class="d-flex justify-content-end align-items-center gap-3 ms-auto">
+			<button class="btn btn-sm btn-primary d-flex align-items-center"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target="#ticket-filter-form">
+				<span class="material-symbols-outlined">filter_list</span>
+				<span class="ms-2">Filters</span>
+			</button>
+		</div>
+
+	</div>
+
 	<hr class="opacity-25">
+
+	<div class="collapse" id="ticket-filter-form">
+		<div class="card card-body mb-3">
+			<form method="get">
+			{% crispy filter.form filter.form.helper %}
+			<div class="d-flex gap-2 mt-2">
+				<button type="submit" class="btn btn-sm btn-primary">Filter</button>
+				<a href="{{ request.path }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+			</div>
+		</form>
+		</div>
+	</div>
+
 
 	{% render_table tickets_table %}
 
@@ -54,3 +86,7 @@
 
 
 {% endblock content %}
+{% block extra_js %}
+	<script defer src="{% static 'service_desk/js/tom-select.complete.min.js' %}"></script>
+	<script defer src="{% static 'service_desk/js/tom-select-init.js' %}"></script>
+{% endblock %}
