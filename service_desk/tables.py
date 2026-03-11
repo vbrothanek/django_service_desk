@@ -2,6 +2,8 @@ from django_tables2 import Table
 from .models import Ticket, Record
 from django.utils.html import format_html
 from django.urls import reverse
+from django.utils import timezone
+
 
 class TicketTable(Table):
     """
@@ -71,10 +73,12 @@ class TicketTable(Table):
         return format_html('<a href="{}" class="ticket-row-link text-decoration-none">{}</a>', url, value)
 
     def render_last_update(self, value, record):
-        return value.strftime('%d.%m.%Y %H:%M')
+        local_time = timezone.localtime(value)
+        return local_time.strftime('%d.%m.%Y %H:%M')
 
     def render_created_at(self, value, record):
-        return value.strftime('%d.%m.%Y %H:%M')
+        local_time = timezone.localtime(value)
+        return local_time.strftime('%d.%m.%Y %H:%M')
 
 
 class RecordTable(Table):
@@ -92,7 +96,8 @@ class RecordTable(Table):
         }
 
     def render_created_at(self, value, record):
-        return value.strftime('%d.%m.%Y %H:%M')
+        local_time = timezone.localtime(value)
+        return local_time.strftime('%d.%m.%Y %H:%M')
 
 
     def render_message(self, value, record):
