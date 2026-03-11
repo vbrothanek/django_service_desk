@@ -1,7 +1,8 @@
-from django.db.models.signals import m2m_changed
+from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
-from .models import User
+from .models import User, Record, Ticket
 from .services import mark_existing_tickets_as_read
+from django.utils import timezone
 
 """
 user_added_to_company
@@ -18,3 +19,13 @@ def user_added_to_company(sender, instance, action, **kwargs):
     if action == 'post_add':
         # print("post_add - marking tickets as read")
         mark_existing_tickets_as_read(instance)
+
+
+"""
+update_ticket_last_update
+Signal when record is created update timestamp to ticket last update.
+"""
+@receiver(post_save, sender=Record)
+def update_ticket_last_update(sender, instance, created, **kwargs):
+    if created:
+        Ticket.objects.filter(pk=instance.ticket_id).update(last_update=timezone.now())
