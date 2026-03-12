@@ -54,7 +54,8 @@ class Ticket(models.Model):
     priority = models.IntegerField(choices=PriorityType, default=PriorityType.NORMAL)
     assigned_to = models.ForeignKey(User, related_name='assigned_tickets', on_delete=models.PROTECT, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    last_update = models.DateTimeField(auto_now=True)
+    last_update = models.DateTimeField(null=True, blank=True)
+    last_update_internal = models.DateTimeField(null=True, blank=True)
     due_date = models.DateField(blank=True, null=True)
     date_of_completion = models.DateField(blank=True, null=True)
     followers = models.ManyToManyField(User, related_name='followed_tickets', blank=True)
@@ -104,6 +105,7 @@ class Record(models.Model):
     message = models.TextField(max_length=5000)
     created_at = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
+    is_internal = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'Record'
