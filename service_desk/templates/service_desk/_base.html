@@ -28,7 +28,7 @@
   	<div class="d-flex d-lg-none">
 		<nav class="navbar bg-dark navbar-dark w-100">
 			<div class="d-flex w-100 px-3">
-				<a class="navbar-brand d-flex align-items-center text-white text-decoration-none" href="/service-desk/">
+				<a class="navbar-brand d-flex align-items-center text-white text-decoration-none" href="{% url 'service_desk:dashboard' %}">
 					<span class="fs-4">Django Service Desk</span>
 				</a>
 				<button class="btn btn-outline-light d-lg-none ms-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasResponsive" aria-controls="offcanvasResponsive">☰</button>
@@ -52,19 +52,19 @@
 					<hr class="border-light opacity-25">
 					<ul class="nav nav-pills flex-column mb-auto">
 						<li class="nav-item">
-							<a class="nav-link link-light link-opacity-75-hover d-flex align-items-center {% if active_page == 'dashboard' %}active{% endif %}" href="/dashboard">
+							<a class="nav-link link-light link-opacity-75-hover d-flex align-items-center {% if active_page == 'dashboard' %}active{% endif %}" href="{% url 'service_desk:dashboard' %}">
 								<span class="material-symbols-outlined">dashboard</span>
 								<span class="ms-2">Dashboard</span>
 							</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link link-light link-opacity-75-hover d-flex align-items-center mt-1 {% if active_page == 'tickets' %}active{% endif %}" href="/tickets">
+							<a class="nav-link link-light link-opacity-75-hover d-flex align-items-center mt-1 {% if active_page == 'tickets' %}active{% endif %}" href="{% url 'service_desk:tickets' %}">
 							<span class="material-symbols-outlined">list_alt</span>
 							<span class="ms-2">Tickets</span>
 							</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link link-light link-opacity-75-hover d-flex align-items-center mt-1 {% if active_page == 'tickets_create' %}active{% endif %}" href="/tickets/create">
+							<a class="nav-link link-light link-opacity-75-hover d-flex align-items-center mt-1 {% if active_page == 'tickets_create' %}active{% endif %}" href="{% url 'service_desk:new_ticket' %}">
 								<span class="material-symbols-outlined">add</span>
 								<span class="ms-2">Create New Ticket</span>
 							</a>
