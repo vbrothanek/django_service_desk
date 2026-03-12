@@ -1,3 +1,4 @@
+from cProfile import label
 from crispy_forms.templatetags.crispy_forms_field import css_class
 from django import forms
 from crispy_forms.helper import FormHelper
@@ -130,7 +131,7 @@ class TicketDetailFollowersForm(forms.ModelForm):
 class NewRecordForm(forms.ModelForm):
     class Meta:
         model = Record
-        fields = ['user', 'message']
+        fields = ['user', 'is_internal', 'message']
         widgets = {
             'message': forms.Textarea(attrs={'placeholder': 'Message...'}),
         }
@@ -140,13 +141,15 @@ class NewRecordForm(forms.ModelForm):
         self.fields['user'].widget.attrs['style'] = 'pointer-events: none;'
         self.fields['user'].widget.attrs['tabindex'] = '-1'
         self.fields['user'].widget.attrs['class'] = 'form-control-plaintext bg-light px-2 border'
-        # self.fields['user'].widget.attrs['readonly'] = True
-        # self.fields['user'].widget.attrs['class'] = 'form-control-plaintext bg-light px-2 border'
+        self.fields['is_internal'].label = 'Internal Record'
 
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
-            Row(Column('user', css_class='col-12 col-lg-4 pb-1'),),
+            Row(
+                Column('user', css_class='col-12 col-lg-4 pb-1'),
+                Column('is_internal', css_class='col-12 col-lg-3 pb-1 mt-4'),
+                css_class='align-items-center'),
             Row(Column('message')),
         )
 
