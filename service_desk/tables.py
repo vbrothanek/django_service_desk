@@ -1,11 +1,13 @@
-from django_tables2 import Table
+from django_tables2 import Table, columns
 from .models import Ticket, Record
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 
 
 class TicketTable(Table):
+    last_update_internal = columns.Column(verbose_name='Last update')
     """
     Rendering methods for TicketTable columns.
     Django Tables2 automatically calls render_<column_name>() for each column defined in Meta.fields.
@@ -23,7 +25,7 @@ class TicketTable(Table):
     class Meta:
         model = Ticket
         template_name = "django_tables2/bootstrap5.html"
-        fields = ('ticket_number', 'subject', 'status', 'priority', 'assigned_to', 'company', 'created_at','last_update')
+        fields = ('ticket_number', 'subject', 'status', 'priority', 'assigned_to', 'company', 'created_at','last_update','last_update_internal')
         attrs = {
             "class": "table table-sm table-hover tickets-table table-striped",
             "thead": {"class": "pt-4"},
@@ -80,19 +82,23 @@ class TicketTable(Table):
         local_time = timezone.localtime(value)
         return local_time.strftime('%d.%m.%Y %H:%M')
 
+    def render_last_update_internal(self, value, record):
+        local_time = timezone.localtime(value)
+        return local_time.strftime('%d.%m.%Y %H:%M')
+
 
 class RecordTable(Table):
+    message = columns.Column(attrs={'th': {'style': 'width: 50%;'}})
+    user = columns.Column(attrs={'th': {'style': 'width: 10%;'}})
+    created_at = columns.Column(attrs={'th': {'style': 'width: 7%;'}})
+    is_internal = columns.Column(verbose_name="Is internal", attrs={'th': {'style': 'width: 7%;'}})
+
     class Meta:
         model = Record
         template_name = "django_tables2/bootstrap5.html"
-        fields = ['message', 'user', 'created_at']
+        fields = ['message', 'user', 'is_internal', 'created_at']
         attrs = {
             "class": "table table-sm table-hover records-table",
-        }
-        column_attrs = {
-            'message': {'style': 'width: 60%;'},
-            'user': {'style': 'width: 25%;'},
-            'created_at': {'style': 'width: 15%;'},
         }
 
     def render_created_at(self, value, record):
@@ -112,3 +118,8 @@ class RecordTable(Table):
 
     def render_user(self, value, record):
         return format_html('<span title="{}">{}</span>', value.username, value.get_full_name())
+
+    def render_is_internal(self, value, record):
+        if value:
+            return mark_safe('<span class="material-symbols-outlined">check_small</span>')
+        return mark_safe('<span class="material-symbols-outlined">close_small</span>')
