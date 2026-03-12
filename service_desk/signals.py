@@ -28,4 +28,15 @@ Signal when record is created update timestamp to ticket last update.
 @receiver(post_save, sender=Record)
 def update_ticket_last_update(sender, instance, created, **kwargs):
     if created:
-        Ticket.objects.filter(pk=instance.ticket_id).update(last_update=timezone.now())
+        # print('created', instance.message)
+        if instance.is_internal:
+            # print('internal', instance.message)
+            Ticket.objects.filter(pk=instance.ticket_id).update(
+                last_update_internal=timezone.now()
+            )
+        else:
+            # print('normal', instance.message)
+            Ticket.objects.filter(pk=instance.ticket_id).update(
+                last_update=timezone.now(),
+                last_update_internal=timezone.now()
+            )
