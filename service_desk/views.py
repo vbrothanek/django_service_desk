@@ -91,7 +91,10 @@ def tickets_view(request):
     tickets = ticket_filter.qs
 
     # Sorting before pagination
-    sort = request.GET.get('sort', '-last_update')
+    if 'Agents' in user_groups:
+        sort = request.GET.get('sort', '-last_update_internal')
+    else:
+        sort = request.GET.get('sort', '-last_update')
     tickets = tickets.order_by(sort)
 
     # Pagination
@@ -101,28 +104,52 @@ def tickets_view(request):
     page = paginator.get_page(page_number)
     page_range = paginator.get_elided_page_range(page_number, on_each_side=2, on_ends=1)
 
+    # Convert QuerySet to list
     tickets_page = list(page.object_list)
 
+    # Load IDs of all tickets the user is following into a set
     user_followed_ids = set(request.user.followed_tickets.values_list('id', flat=True))
 
+    # Load all read statuses for the user as a dictionary {ticket_id: last_read_at}
     read_statuses = dict(
         TicketReadStatus.objects.filter(
             user=request.user).values_list('ticket_id', 'last_read_at'))
 
     for ticket in tickets_page:
+        # Check if the user is a participant of the ticket
         is_participant = (
-                ticket.user.id == request.user.id or                                    # Check if user is the ticket creator
-                (ticket.assigned_to and ticket.assigned_to.id == request.user.id) or    # Check if ticket is assigned to user (assigned_to can be None)
-                ticket.id in user_followed_ids                                          # Check if user is following the ticket
+                ticket.user.id == request.user.id or  # User is the ticket creator
+                (
+                            ticket.assigned_to and ticket.assigned_to.id == request.user.id) or  # Ticket is assigned to the user (assigned_to can be None)
+                ticket.id in user_followed_ids  # User is following the ticket
         )
 
-        if (is_participant and (ticket.pk not in read_statuses or ticket.last_update > read_statuses[ticket.pk])) \
-                or (ticket.status == StatusLevel.NEW and ticket.assigned_to is None):
+        if 'Agents' in user_groups:
+            # Agents can see both public and internal records
+            # Compare against the most recent of both timestamps
+            # filter(None, ...) removes None values, max() returns the newer timestamp
+            last_relevant_update = max(
+                filter(None, [ticket.last_update, ticket.last_update_internal]),
+                default=None
+            )
+        else:
+            # Managers and Customers only see public records
+            # Compare only against last_update
+            last_relevant_update = ticket.last_update
+
+        if (is_participant and (
+                ticket.pk not in read_statuses or  # User has never read the ticket
+                (last_relevant_update and last_relevant_update > read_statuses[ticket.pk]))) \
+                or (ticket.status == StatusLevel.NEW and ticket.assigned_to is None):  # New ticket not yet assigned
             ticket.is_unread = True
         else:
             ticket.is_unread = False
 
-    tickets_table = TicketTable(tickets_page, order_by=sort)
+    if 'Agents' in user_groups:
+        tickets_table = TicketTable(tickets_page, order_by=sort, exclude=('last_update',))
+    else:
+        tickets_table = TicketTable(tickets_page, order_by=sort, exclude=('last_update_internal',))
+
     RequestConfig(request, paginate=False).configure(tickets_table)
 
     context = {
@@ -164,6 +191,8 @@ def create_ticket_view(request):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.user = request.user
+            instance.last_update = timezone.now()
+            instance.last_update_internal = timezone.now()
             instance.save()
 
             for file in request.FILES.getlist('file'):
@@ -189,6 +218,7 @@ def create_ticket_view(request):
 
 @login_required
 def ticket_detail_view(request, ticket_number):
+    user_groups = request.user.groups.values_list('name', flat=True)
     ticket = get_object_or_404(Ticket.objects.select_related('assigned_to', 'user', 'company'),
                                ticket_number=ticket_number)
 
@@ -216,6 +246,8 @@ def ticket_detail_view(request, ticket_number):
                 if 'status' in form.changed_data and form.cleaned_data['assigned_to'] is None:
                     ticket.assigned_to = request.user
 
+                ticket.last_update = timezone.now()
+                ticket.last_update_internal = timezone.now()
                 ticket.save()
                 form_followers.save()
 
@@ -248,6 +280,9 @@ def ticket_detail_view(request, ticket_number):
     records_sorting = request.GET.get('sort', '-created_at')
     records = Record.objects.filter(ticket_id=ticket.pk).select_related('user').order_by(records_sorting)
 
+    if 'Customers' in user_groups or 'Managers' in user_groups:
+        records = records.filter(is_internal=False)
+
     # Pagination
     page_number = request.GET.get('page', 1)
     per_page = request.GET.get('per_page', 15)
@@ -257,7 +292,11 @@ def ticket_detail_view(request, ticket_number):
 
     records_page = list(page.object_list)
 
-    records_table = RecordTable(records_page, order_by=records_sorting)
+    if 'Customers' in user_groups or 'Managers' in user_groups:
+        records_table = RecordTable(records_page, order_by=records_sorting, exclude=('is_internal',))
+    else:
+        records_table = RecordTable(records_page, order_by=records_sorting)
+
     RequestConfig(request, paginate=False).configure(records_table)
 
     context = {'ticket': ticket,
@@ -286,7 +325,6 @@ def record_create_view(request, ticket_number):
 
         if form.is_valid():
             record = form.save(commit=False)
-            print(record.ticket_id, record.user, record.message)
             record.ticket = ticket
             record.user = request.user
             record.save()
