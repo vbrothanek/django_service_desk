@@ -44,6 +44,10 @@ body {
     font-size: 14px;
 }
 
+.records-table .material-symbols-outlined {
+    font-size: 18px;
+}
+
 .tickets-table thead tr th,
 .records-table thead tr th {
     background-color: #0F4C75;
@@ -234,20 +238,6 @@ body {
     min-width: 1rem !important;
 }
 
-.records-table th:nth-child(1),
-.records-table td:nth-child(1) {
-    width: 60%;
-}
-
-.records-table th:nth-child(2),
-.records-table td:nth-child(2) {
-    width: 25%;
-}
-
-.records-table th:nth-child(3),
-.records-table td:nth-child(3) {
-    width: 15%;
-}
 
 .records-table {
     table-layout: fixed;
