@@ -3,7 +3,7 @@ from crispy_forms.templatetags.crispy_forms_field import css_class
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column
-from service_desk.models import Ticket, Record, TicketAttachment
+from service_desk.models import Ticket, Record, TicketAttachment, User
 from service_desk.services import validate_attachment
 
 
@@ -95,6 +95,7 @@ class TicketDetailForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['company'].empty_label = ''
         self.fields['assigned_to'].empty_label = ''
+        self.fields['assigned_to'].queryset = User.objects.filter(groups__name='Agents')
         self.fields['subject'].widget.attrs['readonly'] = True
         self.fields['subject'].widget.attrs['class'] = 'form-control-plaintext bg-light px-2 border detail-view-subject'
 
@@ -126,6 +127,7 @@ class TicketDetailFollowersForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['followers'].label = False
+        self.fields['followers'].queryset = User.objects.filter(groups__name='Agents')
 
 
 class NewRecordForm(forms.ModelForm):
