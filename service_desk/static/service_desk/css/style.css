@@ -48,6 +48,38 @@ body {
     font-size: 18px;
 }
 
+/* Minimum table width to prevent excessive column compression.
+   When the viewport is narrower, the table-responsive wrapper
+   provides a horizontal scrollbar instead of squishing columns. */
+.tickets-table {
+    min-width: 900px;
+    table-layout: fixed;
+    width: 100%;
+}
+
+/* Constrain the table wrapper height to the visible viewport so the
+   table scrolls vertically inside the container. The horizontal scrollbar
+   is always visible at the bottom of the wrapper, not at the bottom of
+   the full page. Adjust the offset (200px) to match your header height. */
+.table-responsive {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+/* Keep the header row visible while scrolling vertically inside
+   the table-responsive container. */
+.tickets-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.tickets-table td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .tickets-table thead tr th,
 .records-table thead tr th {
     background-color: #0F4C75;
@@ -63,41 +95,56 @@ body {
     padding: 8px 12px;
 }
 
-.tickets-table thead tr th > a,
-.records-table thead tr th > a {
-    color: white;
+/* Prevent header cells and data cells from wrapping to multiple lines.
+   This ensures every row stays on a single line regardless of content length. */
+.tickets-table th,
+.tickets-table td,
+.records-table th {
+    white-space: nowrap;
 }
 
-.table thead th a {
-    display: block;
-    width: 100%;
+/* Header sort links use flexbox so the column label and sort icon always
+   stay on a single line. Using float: right on the icon (the Bootstrap/
+   django-tables2 default) causes the icon to wrap onto a second line when
+   the column is narrow — flexbox with margin-left: auto avoids this. */
+.tickets-table thead th a,
+.records-table thead th a {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
     color: white;
     text-decoration: none;
 }
 
+/* Sort icons — default (unsorted) state */
 .tickets-table thead th.orderable a::after,
 .records-table thead th.orderable a::after {
     font-family: 'Material Symbols Outlined';
     content: 'unfold_more';
     opacity: 0.4;
-    float: right;
     font-size: 16px;
+    float: none;        /* override any inherited float */
+    margin-left: auto;  /* push icon to the right via flexbox */
 }
 
+/* Sort icons — ascending state */
 .tickets-table thead th.asc a::after,
 .records-table thead th.asc a::after {
     font-family: 'Material Symbols Outlined';
     content: 'keyboard_arrow_up';
     opacity: 1;
-    float: right;
+    float: none;
+    margin-left: auto;
 }
 
+/* Sort icons — descending state */
 .tickets-table thead th.desc a::after,
 .records-table thead th.desc a::after {
     font-family: 'Material Symbols Outlined';
     content: 'keyboard_arrow_down';
     opacity: 1;
-    float: right;
+    float: none;
+    margin-left: auto;
 }
 
 /* Tickets & Records table styles ends*/
