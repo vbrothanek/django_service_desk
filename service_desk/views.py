@@ -80,11 +80,11 @@ def tickets_view(request):
     user_groups = request.user.groups.values_list('name', flat=True)
 
     if 'Agents' in user_groups:
-        tickets = Ticket.objects.all()
+        tickets = Ticket.objects.select_related('assigned_to', 'company', 'user')
     else:
         tickets = Ticket.objects.filter(
             company__in=request.user.companies.all()
-        )
+        ).select_related('assigned_to', 'company', 'user')
 
     # ticket filters
     ticket_filter = TicketFilter(request.GET, queryset=tickets)
