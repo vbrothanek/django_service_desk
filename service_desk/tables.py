@@ -7,7 +7,6 @@ from django.utils.safestring import mark_safe
 
 
 class TicketTable(Table):
-    last_update_internal = columns.Column(verbose_name='Last update')
     """
     Rendering methods for TicketTable columns.
     Django Tables2 automatically calls render_<column_name>() for each column defined in Meta.fields.
@@ -22,6 +21,16 @@ class TicketTable(Table):
         render_status        - renders status as a Bootstrap badge with color based on status value
         render_priority      - renders priority as a Bootstrap badge with color based on priority value
     """
+
+    ticket_number = columns.Column(verbose_name='Ticket Number', attrs={'th': {'style': 'width: 10%;'}})
+    subject = columns.Column(verbose_name='Subject', attrs={'th': {'style': 'width: 25%;'}})
+    status = columns.Column(verbose_name='Status', attrs={'th': {'style': 'width: 7%;'}})
+    priority = columns.Column(verbose_name='Priority', attrs={'th': {'style': 'width: 7%;'}})
+    assigned_to = columns.Column(verbose_name='Assigned To', attrs={'th': {'style': 'width: 10%;'}})
+    company = columns.Column(verbose_name='Company', attrs={'th': {'style': 'width: 10%;'}})
+    created_at = columns.Column(verbose_name='Created At', attrs={'th': {'style': 'width: 10%;'}})
+    last_update_internal = columns.Column(verbose_name='Last update', attrs={'th': {'style': 'width: 10%;'}})
+
     class Meta:
         model = Ticket
         template_name = "django_tables2/bootstrap5.html"
@@ -34,7 +43,7 @@ class TicketTable(Table):
         lambda record - for each row if record.us_unread set bold, else nothing.
         """
         row_attrs = {
-            'class': lambda record: 'fw-bold' if getattr(record, 'is_unread', False) else ''
+            'class': lambda record: 'fw-bold' if getattr(record, 'is_unread', False) else '',
         }
 
     def render_status(self, value, record):
@@ -61,14 +70,8 @@ class TicketTable(Table):
 
 
     def render_subject(self, value, record):
-        """
-        Renders the subject column with truncated text.
-        If the subject exceeds 40 characters, it is truncated and an ellipsis (…) is appended.
-        The full text is preserved in the tooltip (title attribute) for hover visibility.
-        """
-        short_subject = str(value)[:40] + '...' if len(str(value)) > 40 else str(value)
         url = reverse('service_desk:ticket_detail', args=[record.ticket_number])
-        return format_html('<a href="{}" class="ticket-row-link text-decoration-none" title="{}">{}</a>', url, value, short_subject)
+        return format_html('<a href="{}" class="ticket-row-link text-decoration-none" title="{}">{}</a>', url, value, value)
 
     def render_ticket_number(self,value, record):
         url = reverse('service_desk:ticket_detail', args=[record.ticket_number])
@@ -88,9 +91,9 @@ class TicketTable(Table):
 
 
 class RecordTable(Table):
-    message = columns.Column(attrs={'th': {'style': 'width: 50%;'}})
+    message = columns.Column(attrs={'th': {'style': 'width: 47%;'}})
     user = columns.Column(attrs={'th': {'style': 'width: 10%;'}})
-    created_at = columns.Column(attrs={'th': {'style': 'width: 7%;'}})
+    created_at = columns.Column(attrs={'th': {'style': 'width: 10%;'}})
     is_internal = columns.Column(verbose_name="Is internal", attrs={'th': {'style': 'width: 7%;'}})
 
     class Meta:
