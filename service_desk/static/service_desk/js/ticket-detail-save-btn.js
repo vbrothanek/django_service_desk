@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.querySelectorAll('select').forEach(select => {
         if (select.tomselect) {
-            console.log('chaged tom select')
             select.tomselect.on('change', () => {
                 button.disabled = false;
             });
