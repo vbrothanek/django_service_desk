@@ -32,11 +32,14 @@ def update_ticket_last_update(sender, instance, created, **kwargs):
         if instance.is_internal:
             # print('internal', instance.message)
             Ticket.objects.filter(pk=instance.ticket_id).update(
-                last_update_internal=timezone.now()
+                last_update_internal = timezone.now(),
+                last_updated_by_internal = instance.user
             )
         else:
             # print('normal', instance.message)
             Ticket.objects.filter(pk=instance.ticket_id).update(
-                last_update=timezone.now(),
-                last_update_internal=timezone.now()
+                last_update = timezone.now(),
+                last_update_internal = timezone.now(),
+                last_updated_by = instance.user,
+                last_updated_by_internal = instance.user
             )

@@ -34,7 +34,8 @@ class TicketTable(Table):
     class Meta:
         model = Ticket
         template_name = "django_tables2/bootstrap5.html"
-        fields = ('ticket_number', 'subject', 'status', 'priority', 'assigned_to', 'company', 'created_at','last_update','last_update_internal')
+        fields = ('ticket_number', 'subject', 'status', 'priority', 'assigned_to', 'company', 'created_at',
+                  'last_update', 'last_update_internal')
         attrs = {
             "class": "table table-sm table-hover tickets-table table-striped",
             "thead": {"class": "pt-4"},
@@ -48,32 +49,32 @@ class TicketTable(Table):
 
     def render_status(self, value, record):
         status_classes = {
-            10: 'bg-primary-subtle border border-primary-subtle text-primary-emphasis rounded-pill',  # New
-            20: 'bg-light-subtle border border-light-subtle text-light-emphasis rounded-pill',  # Accepted
-            30: 'bg-warning-subtle border border-warning-subtle text-warning-emphasis rounded-pill',  # In Progress
-            40: 'bg-secondary-subtle border border-secondary-subtle text-secondary-emphasis rounded-pill',  # Waiting
-            50: 'bg-success-subtle border border-success-subtle text-success-emphasis rounded-pill',  # Resolved
-            60: 'bg-dark-subtle border border-dark-subtle text-dark-emphasis rounded-pill',  # Closed
+            10: 'sd-badge-new',
+            20: 'sd-badge-accepted',
+            30: 'sd-badge-inprogress',
+            40: 'sd-badge-waiting',
+            50: 'sd-badge-resolved',
+            60: 'sd-badge-closed',
         }
-        css_class = status_classes.get(record.status, 'bg-secondary')
-        return format_html('<span class="badge {}">{}</span>', css_class, value)
+        css = status_classes.get(record.status, '')
+        return format_html('<span class="sd-badge {}">{}</span>', css, value)
 
     def render_priority(self, value, record):
         priority_classes = {
-            10: 'bg-success-subtle border border-success-subtle text-success-emphasis rounded-pill',  # Low
-            20: 'bg-info-subtle border border-info-subtle text-info-emphasis rounded-pill',  # Normal
-            30: 'bg-warning-subtle border border-warning-subtle text-warning-emphasis rounded-pill',  # High
-            40: 'bg-danger-subtle border border-danger-subtle text-danger-emphasis rounded-pill',  # Critical
+            10: 'sd-badge-low',
+            20: 'sd-badge-normal',
+            30: 'sd-badge-high',
+            40: 'sd-badge-critical',
         }
-        css_class = priority_classes.get(record.priority, 'bg-secondary')
-        return format_html('<span class="badge {}">{}</span>', css_class, value)
-
+        css = priority_classes.get(record.priority, '')
+        return format_html('<span class="sd-badge {}">{}</span>', css, value)
 
     def render_subject(self, value, record):
         url = reverse('service_desk:ticket_detail', args=[record.ticket_number])
-        return format_html('<a href="{}" class="ticket-row-link text-decoration-none" title="{}">{}</a>', url, value, value)
+        return format_html('<a href="{}" class="ticket-row-link text-decoration-none" title="{}">{}</a>', url, value,
+                           value)
 
-    def render_ticket_number(self,value, record):
+    def render_ticket_number(self, value, record):
         url = reverse('service_desk:ticket_detail', args=[record.ticket_number])
         return format_html('<a href="{}" class="ticket-row-link text-decoration-none">{}</a>', url, value)
 
@@ -91,15 +92,21 @@ class TicketTable(Table):
 
 
 class RecordTable(Table):
-    message = columns.Column(attrs={'th': {'style': 'width: 47%;'}})
+    message = columns.Column(attrs={'th': {'style': 'width: 42%;'}})
     user = columns.Column(attrs={'th': {'style': 'width: 10%;'}})
     created_at = columns.Column(attrs={'th': {'style': 'width: 10%;'}})
     is_internal = columns.Column(verbose_name="Is internal", attrs={'th': {'style': 'width: 7%;'}})
+    actions = columns.Column(empty_values=(), verbose_name='', orderable=False, attrs={'th': {'style': 'width: 5%;'}})
+
+    def __init__(self, *args, **kwargs):
+        self.current_user = kwargs.pop('current_user', None)
+        self.is_agent = kwargs.pop('is_agent', None)
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = Record
         template_name = "django_tables2/bootstrap5.html"
-        fields = ['message', 'user', 'is_internal', 'created_at']
+        fields = ['message', 'user', 'is_internal', 'created_at', 'actions']
         attrs = {
             "class": "table table-sm table-hover records-table",
         }
@@ -107,7 +114,6 @@ class RecordTable(Table):
     def render_created_at(self, value, record):
         local_time = timezone.localtime(value)
         return local_time.strftime('%d.%m.%Y %H:%M')
-
 
     def render_message(self, value, record):
         return format_html(
@@ -126,3 +132,27 @@ class RecordTable(Table):
         if value:
             return mark_safe('<span class="material-symbols-outlined">check_small</span>')
         return mark_safe('<span class="material-symbols-outlined">close_small</span>')
+
+    def render_actions(self, record):
+        can_edit = self.is_agent or (self.current_user and record.user == self.current_user)
+        edit_url = reverse('service_desk:record_edit', args=[record.ticket.ticket_number, record.pk])
+        delete_url = reverse('service_desk:record_delete', args=[record.ticket.ticket_number, record.pk])
+
+        if can_edit:
+            return format_html(
+                # edit button
+                '<a hx-get="{}" hx-target="#record-edit-modal-content" hx-swap="innerHTML" '
+                'class="record-action-btn record-action-edit me-2" style="cursor:pointer;">'
+                '<span class="material-symbols-outlined">edit</span></a>'
+                # delete button
+                '<a class="record-action-btn record-action-delete" data-delete-url="{}" style="cursor:pointer;">'
+                '<span class="material-symbols-outlined">delete</span></a>',
+                edit_url, delete_url
+            )
+        else:
+            return mark_safe(
+                '<span class="record-action-btn record-action-disabled me-2" style="cursor:pointer;">'
+                '<span class="material-symbols-outlined">edit</span></span>'
+                '<span class="record-action-btn record-action-disabled" style="cursor:pointer;">'
+                '<span class="material-symbols-outlined">delete</span></span>'
+            )

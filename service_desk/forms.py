@@ -92,12 +92,17 @@ class TicketDetailForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        is_agent = kwargs.pop('is_agent', False)
         super().__init__(*args, **kwargs)
         self.fields['company'].empty_label = ''
         self.fields['assigned_to'].empty_label = ''
         self.fields['assigned_to'].queryset = User.objects.filter(groups__name='Agents')
-        self.fields['subject'].widget.attrs['readonly'] = True
-        self.fields['subject'].widget.attrs['class'] = 'form-control-plaintext bg-light px-2 border detail-view-subject'
+
+        # If user is not an agent, render company, priority, assigned_to, status, due_date and subject as read-only - DISABLED.
+        if not is_agent:
+            readonly_fields = ['company', 'priority', 'assigned_to', 'status', 'due_date', 'subject']
+            for field_name in readonly_fields:
+                self.fields[field_name].disabled = True
 
         if self.instance and self.instance.pk:
             self.fields['subject'].initial = self.instance.subject
@@ -139,19 +144,68 @@ class NewRecordForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        is_agent = kwargs.pop('is_agent', False)
+
         super().__init__(*args, **kwargs)
         self.fields['user'].widget.attrs['style'] = 'pointer-events: none;'
         self.fields['user'].widget.attrs['tabindex'] = '-1'
         self.fields['user'].widget.attrs['class'] = 'form-control-plaintext bg-light px-2 border'
         self.fields['is_internal'].label = 'Internal Record'
 
+        if not is_agent:
+            del self.fields['is_internal']
+
         self.helper = FormHelper()
         self.helper.form_tag = False
-        self.helper.layout = Layout(
-            Row(
-                Column('user', css_class='col-12 col-lg-4 pb-1'),
-                Column('is_internal', css_class='col-12 col-lg-3 pb-1 mt-4'),
-                css_class='align-items-center'),
-            Row(Column('message')),
-        )
 
+        if is_agent:
+            self.helper.layout = Layout(
+                Row(
+                    Column('user', css_class='col-12 col-lg-4 pb-1'),
+                    Column('is_internal', css_class='col-12 col-lg-3 pb-1 mt-4'),
+                    css_class='align-items-center'),
+                Row(Column('message'))
+            )
+        else:
+            self.helper.layout = Layout(
+                Row(
+                    Column('user', css_class='col-12 col-lg-4 pb-1'),
+                Row(Column('message')))
+            )
+
+
+class RecordEditForm(forms.ModelForm):
+    class Meta:
+        model = Record
+        fields = ['user', 'is_internal', 'message']
+        widgets = {
+            'message': forms.Textarea(attrs={'placeholder': 'Message...'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        is_agent = kwargs.pop('is_agent', False)
+
+        super().__init__(*args, **kwargs)
+        self.fields['is_internal'].label = 'Internal Record'
+        self.fields['user'].disabled = True
+
+        if not is_agent:
+            del self.fields['is_internal']
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+
+        if is_agent:
+            self.helper.layout = Layout(
+                Row(
+                    Column('user', css_class='col-12 col-lg-4 pb-1'),
+                    Column('is_internal', css_class='col-12 col-lg-3 pb-1 mt-4'),
+                    css_class='align-items-center'),
+                Row(Column('message')),
+            )
+        else:
+            self.helper.layout = Layout(
+                Row(Column('user', css_class='col-12 col-lg-4 pb-1'),
+                Row(Column('message'))
+                    )
+            )

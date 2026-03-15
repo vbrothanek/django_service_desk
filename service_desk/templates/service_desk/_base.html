@@ -29,7 +29,10 @@
 		<nav class="navbar bg-dark navbar-dark w-100">
 			<div class="d-flex w-100 px-3">
 				<a class="navbar-brand d-flex align-items-center text-white text-decoration-none" href="{% url 'service_desk:dashboard' %}">
-					<span class="fs-4">Django Service Desk</span>
+{#					<span class="fs-4">Django Service Desk</span>#}
+					  <span class="sidebar-logo">
+						  <span class="sidebar-logo-dot"></span>Service Desk
+					  </span>
 				</a>
 				<button class="btn btn-outline-light d-lg-none ms-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasResponsive" aria-controls="offcanvasResponsive">☰</button>
 			</div>
@@ -47,7 +50,10 @@
 			<div class="offcanvas-body d-flex flex-column flex-grow-1 p-3">
 				<nav class="d-flex flex-column flex-grow-1">
 					<a href="/" class="d-flex align-items-center justify-content-center mt-3 mb-3 text-white text-decoration-none">
-						<span class="fs-4">Django Service Desk</span>
+{#						<span class="fs-4">Django Service Desk</span>#}
+						<span class="sidebar-logo">
+							<span class="sidebar-logo-dot"></span>Service Desk
+					  	</span>
 					</a>
 					<hr class="border-light opacity-25">
 					<ul class="nav nav-pills flex-column mb-auto">
@@ -72,12 +78,12 @@
 					</ul>
 					<hr class="border-light opacity-25">
 					<div class="dropdown">
-						<a href="#" class="d-flex align-items-center link-light link-opacity-75-hover text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
+						<a href="#" class="sidebar-user d-flex align-items-center link-light link-opacity-75-hover text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
 							<div class="d-flex align-items-center justify-content-center rounded-circle text-white user-account-profile-picture">
 								{{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}
 							</div>
 							<div class="ms-3 d-flex flex-column">
-								<span>{{ user.first_name }}</span>
+								<span class="sidebar-user-name">{{ user.first_name }}</span>
 								<span class="small user-profile-mail">{{ user.email }}</span>
 							</div>
 						</a>

@@ -56,6 +56,8 @@ class Ticket(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(null=True, blank=True)
     last_update_internal = models.DateTimeField(null=True, blank=True)
+    last_updated_by = models.ForeignKey(User, related_name='last_updated_tickets', on_delete=models.SET_NULL, blank=True, null=True)
+    last_updated_by_internal = models.ForeignKey(User, related_name='last_updated_internal_tickets', on_delete=models.SET_NULL, blank=True, null=True)
     due_date = models.DateField(blank=True, null=True)
     date_of_completion = models.DateField(blank=True, null=True)
     followers = models.ManyToManyField(User, related_name='followed_tickets', blank=True)

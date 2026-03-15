@@ -11,7 +11,7 @@
 
 {% block content %}
 	<div class="d-flex align-items-center gap-3 mb-3">
-		<h3 class="mb-0">Tickets</h3>
+		<h3 class="mb-0 fw-light">Tickets</h3>
 		<div class="d-flex justify-content-end align-items-center gap-3 ms-auto">
 			<button class="btn btn-sm btn-primary d-flex align-items-center"
 				type="button"
@@ -29,12 +29,12 @@
 	<div class="collapse" id="ticket-filter-form">
 		<div class="card card-body mb-3">
 			<form method="get">
-			{% crispy filter.form filter.form.helper %}
-			<div class="d-flex gap-2 mt-2">
-				<button type="submit" class="btn btn-sm btn-primary">Filter</button>
-				<a href="{{ request.path }}" class="btn btn-sm btn-outline-secondary">Reset</a>
-			</div>
-		</form>
+				{% crispy filter.form filter.form.helper %}
+				<div class="d-flex gap-2 mt-2">
+					<button type="submit" class="btn btn-sm btn-primary">Filter</button>
+					<a href="{{ request.path }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+				</div>
+			</form>
 		</div>
 	</div>
 

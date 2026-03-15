@@ -130,6 +130,10 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
+ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 300
+
 # SingUp page availability
 ACCOUNT_ADAPTER = "service_desk.adapters.NoSignupAccountAdapter"
 LOGIN_REDIRECT_URL = '/dashboard'

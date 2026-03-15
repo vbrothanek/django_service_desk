@@ -14,7 +14,8 @@
 			 href="#"
 			 hx-get="{{ request.path }}?page={{ page.previous_page_number }}&per_page={{ per_page }}"
 			 hx-target="#records-container"
-			 hx-swap="innerHTML">
+			 hx-swap="innerHTML"
+			 hx-include="#record-filter-form form">
 			<span aria-hidden="true">&laquo;</span>
 		  </a>
 		</li>
@@ -26,7 +27,8 @@
 			 href="#"
 			 hx-get="{{ request.path }}?page={{ page_num }}&per_page={{ per_page }}"
 			 hx-target="#records-container"
-			 hx-swap="innerHTML">{{ page_num }}</a>
+			 hx-swap="innerHTML"
+			 hx-include="#record-filter-form form">{{ page_num }}</a>
 		</li>
 		{% endfor %}
 
@@ -36,7 +38,8 @@
 			 href="#"
 			 hx-get="{{ request.path }}?page={{ page.next_page_number }}&per_page={{ per_page }}"
 			 hx-target="#records-container"
-			 hx-swap="innerHTML">
+			 hx-swap="innerHTML"
+			 hx-include="#record-filter-form form">
 			<span aria-hidden="true">&raquo;</span>
 		  </a>
 		</li>
@@ -56,28 +59,32 @@
 			   href="#"
 			   hx-get="{{ request.path }}?page=1&per_page=5"
 			   hx-target="#records-container"
-			   hx-swap="innerHTML">5</a>
+			   hx-swap="innerHTML"
+			   hx-include="#record-filter-form form">5</a>
 		</li>
 		<li>
 			<a class="dropdown-item"
 			   href="#"
 			   hx-get="{{ request.path }}?page=1&per_page=15"
 			   hx-target="#records-container"
-			   hx-swap="innerHTML">15</a>
+			   hx-swap="innerHTML"
+			   hx-include="#record-filter-form form">15</a>
 		</li>
 		<li>
 			<a class="dropdown-item"
 			   href="#"
 			   hx-get="{{ request.path }}?page=1&per_page=30"
 			   hx-target="#records-container"
-			   hx-swap="innerHTML">30</a>
+			   hx-swap="innerHTML"
+			   hx-include="#record-filter-form form">30</a>
 		</li>
 	  	<li>
 			<a class="dropdown-item"
 			   href="#"
 			   hx-get="{{ request.path }}?page=1&per_page=40"
 			   hx-target="#records-container"
-			   hx-swap="innerHTML">40</a>
+			   hx-swap="innerHTML"
+			   hx-include="#record-filter-form form">40</a>
 		</li>
 	  </ul>
 	</div>

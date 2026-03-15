@@ -1,13 +1,13 @@
 from django.db.models import OuterRef, Subquery, DateTimeField
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django_tables2 import RequestConfig
-from .filters import TicketFilter
+from .filters import TicketFilter, RecordFilter
 from .models import Ticket, Company, Record, TicketReadStatus, TicketAttachment, StatusLevel
 from django.contrib.auth.decorators import login_required
 from service_desk.forms import TicketForm, TicketAttachmentForm, TicketDetailForm, TicketDetailFollowersForm, \
-    NewRecordForm
+    NewRecordForm, RecordEditForm
 from django.core.paginator import Paginator
 from .tables import TicketTable, RecordTable
 
@@ -86,8 +86,14 @@ def tickets_view(request):
             company__in=request.user.companies.all()
         ).select_related('assigned_to', 'company', 'user')
 
+
     # ticket filters
-    ticket_filter = TicketFilter(request.GET, queryset=tickets)
+    filter_data = request.GET.copy()
+
+    if 'Agents' in user_groups and 'status' not in request.GET:
+        filter_data.setlist('status', ['10', '20', '30', '40'])
+
+    ticket_filter = TicketFilter(filter_data, queryset=tickets)
     tickets = ticket_filter.qs
 
     # Sorting before pagination
@@ -193,6 +199,8 @@ def create_ticket_view(request):
             instance.user = request.user
             instance.last_update = timezone.now()
             instance.last_update_internal = timezone.now()
+            instance.last_updated_by = request.user
+            instance.last_updated_by_internal = instance.user
             instance.save()
 
             for file in request.FILES.getlist('file'):
@@ -219,10 +227,11 @@ def create_ticket_view(request):
 @login_required
 def ticket_detail_view(request, ticket_number):
     user_groups = request.user.groups.values_list('name', flat=True)
-    ticket = get_object_or_404(Ticket.objects.select_related('assigned_to', 'user', 'company'),
+    is_agent = "Agents" in user_groups
+    ticket = get_object_or_404(Ticket.objects.select_related('assigned_to', 'user', 'company', 'last_updated_by', 'last_updated_by_internal'),
                                ticket_number=ticket_number)
 
-    form = TicketDetailForm(instance=ticket)
+    form = TicketDetailForm(instance=ticket, is_agent=is_agent)
     form_followers = TicketDetailFollowersForm(instance=ticket)
     attachment_form = TicketAttachmentForm()
     record_form = NewRecordForm(initial={'user': request.user})
@@ -232,15 +241,20 @@ def ticket_detail_view(request, ticket_number):
 
         # Initialize all forms with instance defaults to ensure context is always complete,
         # regardless of which form was submitted or whether validation failed.
-        form = TicketDetailForm(instance=ticket)
+        form = TicketDetailForm(instance=ticket, is_agent=is_agent)
         form_followers = TicketDetailFollowersForm(instance=ticket)
         attachment_form = TicketAttachmentForm()
 
         if form_type == 'ticket':
-            form = TicketDetailForm(request.POST, instance=ticket)
-            form_followers = TicketDetailFollowersForm(request.POST, instance=ticket)
+            form = TicketDetailForm(request.POST, instance=ticket,  is_agent=is_agent)
 
-            if form.is_valid() and form_followers.is_valid():
+            if is_agent:
+                form_followers = TicketDetailFollowersForm(request.POST, instance=ticket)
+
+            form_valid = form.is_valid()
+            followers_valid = form_followers.is_valid() if is_agent else True
+
+            if form_valid and followers_valid:
                 ticket = form.save(commit=False)
 
                 if 'status' in form.changed_data and form.cleaned_data['assigned_to'] is None:
@@ -248,8 +262,12 @@ def ticket_detail_view(request, ticket_number):
 
                 ticket.last_update = timezone.now()
                 ticket.last_update_internal = timezone.now()
+                ticket.last_updated_by = request.user
+                ticket.last_updated_by_internal = request.user
                 ticket.save()
-                form_followers.save()
+
+                if is_agent:
+                    form_followers.save()
 
                 return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
 
@@ -278,7 +296,9 @@ def ticket_detail_view(request, ticket_number):
     )
 
     records_sorting = request.GET.get('sort', '-created_at')
-    records = Record.objects.filter(ticket_id=ticket.pk).select_related('user').order_by(records_sorting)
+    records = Record.objects.filter(ticket_id=ticket.pk).select_related('user', 'ticket')
+    records_filter = RecordFilter(request.GET, queryset=records, is_agent=is_agent)
+    records = records_filter.qs.order_by(records_sorting)
 
     if 'Customers' in user_groups or 'Managers' in user_groups:
         records = records.filter(is_internal=False)
@@ -293,9 +313,11 @@ def ticket_detail_view(request, ticket_number):
     records_page = list(page.object_list)
 
     if 'Customers' in user_groups or 'Managers' in user_groups:
-        records_table = RecordTable(records_page, order_by=records_sorting, exclude=('is_internal',))
+        records_table = RecordTable(records_page, order_by=records_sorting,
+                                    exclude=('is_internal',), current_user=request.user, is_agent=is_agent)
     else:
-        records_table = RecordTable(records_page, order_by=records_sorting)
+        records_table = RecordTable(records_page, order_by=records_sorting,
+                                    current_user=request.user, is_agent=is_agent)
 
     RequestConfig(request, paginate=False).configure(records_table)
 
@@ -308,6 +330,8 @@ def ticket_detail_view(request, ticket_number):
                'page': page,  # records
                'page_range': page_range,
                'per_page': per_page,
+               'is_agent': is_agent,
+               'records_filter': records_filter,
                'active_page': 'tickets'}
 
     if request.headers.get('HX-Request'):
@@ -333,3 +357,43 @@ def record_create_view(request, ticket_number):
 
     return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
 
+@login_required
+def record_edit_view(request, ticket_number, pk):
+    record = get_object_or_404(Record, pk=pk)
+    is_agent = 'Agents' in request.user.groups.values_list('name', flat=True)
+
+    if not is_agent and record.user != request.user:
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        form = RecordEditForm(request.POST, instance=record, is_agent=is_agent)
+
+        if form.is_valid():
+            form.save()
+            return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
+
+    else:
+        form = RecordEditForm(instance=record, is_agent=is_agent)
+
+    context = {'form': form,
+               'record': record,
+               'ticket_number': ticket_number,
+               'is_agent': is_agent
+               }
+
+    return render(request, 'service_desk/include/record_edit_modal.html', context)
+
+
+@login_required
+def record_delete_view(request, ticket_number, pk):
+    record = get_object_or_404(Record, pk=pk)
+    is_agent = 'Agents' in request.user.groups.values_list('name', flat=True)
+
+    if not is_agent and record.user != request.user:
+      return HttpResponseForbidden()
+
+    if request.method == 'POST':
+      record.delete()
+      return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
+
+    return HttpResponseForbidden()
