@@ -135,24 +135,23 @@ class RecordTable(Table):
 
     def render_actions(self, record):
         can_edit = self.is_agent or (self.current_user and record.user == self.current_user)
+        can_delete = self.is_agent
         edit_url = reverse('service_desk:record_edit', args=[record.ticket.ticket_number, record.pk])
         delete_url = reverse('service_desk:record_delete', args=[record.ticket.ticket_number, record.pk])
 
         if can_edit:
-            return format_html(
-                # edit button
-                '<a hx-get="{}" hx-target="#record-edit-modal-content" hx-swap="innerHTML" '
-                'class="record-action-btn record-action-edit me-2" style="cursor:pointer;">'
-                '<span class="material-symbols-outlined">edit</span></a>'
-                # delete button
-                '<a class="record-action-btn record-action-delete" data-delete-url="{}" style="cursor:pointer;">'
-                '<span class="material-symbols-outlined">delete</span></a>',
-                edit_url, delete_url
-            )
+            edit_html = f'<a hx-get="{edit_url}" hx-target="#record-edit-modal-content" hx-swap="innerHTML" '\
+                        f'class="record-action-btn record-action-edit me-2" style="cursor:pointer;">'\
+                        f'<span class="material-symbols-outlined">edit</span></a>'
         else:
-            return mark_safe(
-                '<span class="record-action-btn record-action-disabled me-2" style="cursor:pointer;">'
-                '<span class="material-symbols-outlined">edit</span></span>'
-                '<span class="record-action-btn record-action-disabled" style="cursor:pointer;">'
-                '<span class="material-symbols-outlined">delete</span></span>'
-            )
+            edit_html = '<span class="record-action-btn record-action-disabled me-2" style="cursor:pointer;">'\
+                        '<span class="material-symbols-outlined">edit</span></span>'
+
+        if can_delete:
+            delete_html = f'<a class="record-action-btn record-action-delete" data-delete-url="{delete_url}" style="cursor:pointer;">'\
+                          f'<span class="material-symbols-outlined">delete</span></a>'
+        else:
+            delete_html = '<span class="record-action-btn record-action-disabled" style="cursor:pointer;">'\
+                         '<span class="material-symbols-outlined">delete</span></span>'
+
+        return mark_safe(edit_html + delete_html)

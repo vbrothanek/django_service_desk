@@ -390,7 +390,7 @@ def record_delete_view(request, ticket_number, pk):
     record = get_object_or_404(Record, pk=pk)
     is_agent = 'Agents' in request.user.groups.values_list('name', flat=True)
 
-    if not is_agent and record.user != request.user:
+    if not is_agent:
       return HttpResponseForbidden()
 
     if request.method == 'POST':
