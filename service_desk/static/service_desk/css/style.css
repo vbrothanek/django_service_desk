@@ -613,3 +613,15 @@ body {
     border-color: rgba(255, 255, 255, 0.08);
     margin: 4px 0;
 }
+
+/* Dashboard cards */
+.dashboard-card {
+    border: 0 !important;
+    border-left: 3px solid var(--sidebar-accent) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-card .material-symbols-outlined {
+    font-size: 22px;
+    color: #adb5bd;
+}

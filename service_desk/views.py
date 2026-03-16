@@ -20,17 +20,26 @@ def default_view(request):
 
 @login_required
 def dashboard_view(request):
-    per_fetch = 5
-    data = Ticket.objects.values('company', 'company__name', 'ticket_number', 'assigned_to', 'user')
-    data = list(data[:per_fetch])
+    user_groups = request.user.groups.values_list('name', flat=True)
+    is_agent = 'Agents' in user_groups
 
-    next_url = f'/api-htmx/?startFrom={per_fetch}' if len(data) == per_fetch else None
+    if is_agent:
+        base_qs = Ticket.objects.all()
+    else:
+        base_qs = Ticket.objects.filter(company__in=request.user.companies.all())
 
     context = {
-        'active_page': 'dashboard',
-        'data': data,
-        'next': next_url
+        'open_tickets': base_qs.exclude(status__in=[50, 60]).count(),
+        'overdue_tickets': base_qs.exclude(status__in=[50, 60]).filter(due_date__lt=timezone.now().date()).count(),
+        'is_agent': is_agent,
+        'active_page': 'dashboard'
     }
+
+    if is_agent:
+        context['my_tickets'] = base_qs.filter(assigned_to=request.user).count()
+        context['unassigned_tickets'] = base_qs.filter(assigned_to=None).count()
+
+
     return render(request, 'service_desk/dashboard.html', context)
 
 @login_required

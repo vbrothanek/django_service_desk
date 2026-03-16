@@ -6,10 +6,60 @@
 	<h3 class="mb-0 fw-light">Dashboard</h3>
 	<hr class="opacity-25">
 
+	<div class="row g-3 mt-2">
+
+		<div class="col-12 col-md-6 col-lg-3">
+			<div class="card h-100 dashboard-card">
+				<div class="card-body d-flex align-items-center gap-3">
+					<span class="material-symbols-outlined">confirmation_number</span>
+					<div>
+						<p class="text-muted small mb-1">Open Tickets</p>
+						<h3 class="fw-bold mb-0">{{ open_tickets }}</h3>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-12 col-md-6 col-lg-3">
+			<div class="card h-100 dashboard-card">
+				<div class="card-body d-flex align-items-center gap-3">
+					<span class="material-symbols-outlined">schedule</span>
+					<div>
+						<p class="text-muted small mb-1">Overdue Tickets</p>
+						<h3 class="fw-bold mb-0">{{ overdue_tickets }}</h3>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		{% if is_agent %}
+			<div class="col-12 col-md-6 col-lg-3">
+				<div class="card h-100 dashboard-card">
+					<div class="card-body d-flex align-items-center gap-3">
+						<span class="material-symbols-outlined">person</span>
+						<div>
+							<p class="text-muted small mb-1">Assigned to Me</p>
+							<h3 class="fw-bold mb-0">{{ my_tickets }}</h3>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-12 col-md-6 col-lg-3">
+				<div class="card h-100 dashboard-card">
+					<div class="card-body d-flex align-items-center gap-3">
+						<span class="material-symbols-outlined">person_off</span>
+						<div>
+							<p class="text-muted small mb-1">Unassigned Tickets</p>
+							<h3 class="fw-bold mb-0">{{ unassigned_tickets }}</h3>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+
+	</div>
+
 
 {% endblock content %}
 
-
-{% block extra_js %}
-	<script defer src="{% static 'service_desk/js/fetch.js' %}"></script>
-{% endblock %}
