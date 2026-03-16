@@ -6,7 +6,7 @@
 {% load tz %}
 
 {% block extra_head %}
-    <link rel="stylesheet" href="{% static 'service_desk/css/tom-select.bootstrap5.min.css' %}">
+	<link rel="stylesheet" href="{% static 'service_desk/css/tom-select.bootstrap5.min.css' %}">
 {% endblock extra_head %}
 
 {% block content %}
@@ -14,9 +14,9 @@
 		<h3 class="mb-0 fw-light">Tickets</h3>
 		<div class="d-flex justify-content-end align-items-center gap-3 ms-auto">
 			<button class="btn btn-sm btn-primary d-flex align-items-center"
-				type="button"
-				data-bs-toggle="collapse"
-				data-bs-target="#ticket-filter-form">
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#ticket-filter-form">
 				<span class="material-symbols-outlined">filter_list</span>
 				<span class="ms-2">Filters</span>
 			</button>
@@ -42,49 +42,64 @@
 		{% render_table tickets_table %}
 	</div>
 
-	<div class="my-4 d-flex justify-content-end gap-3">
-    <nav aria-label="Page navigation">
-      <ul class="pagination pagination-sm">
+	<div class="my-2 d-flex justify-content-between align-items-center gap-3">
+		<span class="text-muted small">Total {{ page.paginator.count }} tickets</span>
+		<div class="d-flex align-items-center gap-3">
+			<nav aria-label="Page navigation">
+				<ul class="pagination pagination-sm mb-0">
 
-        {% if page.has_previous %}
-        <li class="page-item">
-          <a class="page-link" href="{{ request.path }}?{% url_replace page=page.previous_page_number %}" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-        {% endif %}
+					{% if page.has_previous %}
+						<li class="page-item">
+							<a class="page-link"
+							   href="{{ request.path }}?{% url_replace page=page.previous_page_number %}"
+							   aria-label="Previous">
+								<span aria-hidden="true">&laquo;</span>
+							</a>
+						</li>
+					{% endif %}
 
-        {% for page_num in page_range %}
-        <li class="page-item {% if page_num == page.number %}active{% endif %}">
-          <a class="page-link" href="{{ request.path }}?{% url_replace page=page_num %}">{{ page_num }}</a>
-        </li>
-        {% endfor %}
+					{% for page_num in page_range %}
+						<li class="page-item {% if page_num == page.number %}active{% endif %}">
+							<a class="page-link"
+							   href="{{ request.path }}?{% url_replace page=page_num %}">{{ page_num }}</a>
+						</li>
+					{% endfor %}
 
-        {% if page.has_next %}
-        <li class="page-item">
-          <a class="page-link" href="{{ request.path }}?{% url_replace page=page.next_page_number %}" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-        {% endif %}
+					{% if page.has_next %}
+						<li class="page-item">
+							<a class="page-link" href="{{ request.path }}?{% url_replace page=page.next_page_number %}"
+							   aria-label="Next">
+								<span aria-hidden="true">&raquo;</span>
+							</a>
+						</li>
+					{% endif %}
 
-      </ul>
-    </nav>
+				</ul>
+			</nav>
 
-	<div class="dropdown">
-	  <a class="btn btn-sm btn-outline-primary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-		  {{ request.GET.per_page|default:"20" }}
-	  </a>
+			<div class="dropdown">
+				<a class="btn btn-sm btn-outline-primary dropdown-toggle" href="#" role="button"
+				   data-bs-toggle="dropdown"
+				   aria-expanded="false">
+					{{ request.GET.per_page|default:"20" }}
+				</a>
 
-	  <ul class="dropdown-menu dropdown-menu-end">
-	  	<li><a class="dropdown-item" href="{{ request.path }}?{% url_replace page=1 per_page=5 %}">5</a></li>
-		<li><a class="dropdown-item" href="{{ request.path }}?{% url_replace page=1 per_page=20 %}">20</a></li>
-		<li><a class="dropdown-item" href="{{ request.path }}?{% url_replace page=1 per_page=40 %}">40</a></li>
-		<li><a class="dropdown-item" href="{{ request.path }}?{% url_replace page=1 per_page=60 %}">60</a></li>
-	  </ul>
+				<ul class="dropdown-menu dropdown-menu-end">
+					<li><a class="dropdown-item" href="{{ request.path }}?{% url_replace page=1 per_page=5 %}">5</a>
+					</li>
+					<li><a class="dropdown-item" href="{{ request.path }}?{% url_replace page=1 per_page=20 %}">20</a>
+					</li>
+					<li><a class="dropdown-item" href="{{ request.path }}?{% url_replace page=1 per_page=40 %}">40</a>
+					</li>
+					<li><a class="dropdown-item" href="{{ request.path }}?{% url_replace page=1 per_page=60 %}">60</a>
+					</li>
+				</ul>
+			</div>
+
+		</div>
+
+
 	</div>
-
-</div>
 
 
 {% endblock content %}
