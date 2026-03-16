@@ -234,7 +234,7 @@ def ticket_detail_view(request, ticket_number):
     form = TicketDetailForm(instance=ticket, is_agent=is_agent)
     form_followers = TicketDetailFollowersForm(instance=ticket)
     attachment_form = TicketAttachmentForm()
-    record_form = NewRecordForm(initial={'user': request.user})
+    record_form = NewRecordForm(initial={'user': request.user}, is_agent=is_agent)
 
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
@@ -345,7 +345,8 @@ def record_create_view(request, ticket_number):
     ticket = get_object_or_404(Ticket, ticket_number=ticket_number)
 
     if request.method == 'POST':
-        form = NewRecordForm(request.POST)
+        is_agent = 'Agents' in request.user.groups.values_list('name', flat=True)
+        form = NewRecordForm(request.POST, is_agent=is_agent)
 
         if form.is_valid():
             record = form.save(commit=False)
