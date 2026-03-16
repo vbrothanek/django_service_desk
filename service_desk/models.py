@@ -47,7 +47,7 @@ class StatusLevel(models.IntegerChoices):
 class Ticket(models.Model):
     ticket_number = models.CharField(max_length=15, unique=True, blank=True, editable=False)
     company = models.ForeignKey(Company, related_name='tickets', on_delete=models.PROTECT)
-    user = models.ForeignKey(User, related_name='created_tickets', on_delete=models.PROTECT)
+    user = models.ForeignKey(User, related_name='created_tickets', on_delete=models.SET_NULL, null=True, blank=True)
     subject = models.CharField(max_length=100)
     description = models.TextField(max_length=5000 ,blank=False)
     status = models.IntegerField(choices=StatusLevel, default=StatusLevel.NEW)
