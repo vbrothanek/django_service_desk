@@ -166,6 +166,9 @@ def tickets_view(request):
         'page_range': page_range,
     }
 
+    if request.headers.get('HX-Request'):
+        return render(request, 'service_desk/include/tickets_table.html', context)
+
     return render(request, 'service_desk/tickets.html', context)
 
 

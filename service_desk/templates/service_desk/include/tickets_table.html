@@ -1,0 +1,104 @@
+{% load django_tables2 %}
+{% load url_helpers %}
+
+<div class="table-responsive">
+	{% render_table tickets_table %}
+</div>
+
+<div class="my-2 d-flex justify-content-between align-items-center gap-3">
+	<span class="text-muted small">Total {{ page.paginator.count }} tickets</span>
+	<div class="d-flex align-items-center gap-3">
+		<nav aria-label="Page navigation">
+			<ul class="pagination pagination-sm mb-0">
+
+				{% if page.has_previous %}
+					<li class="page-item">
+						<a class="page-link"
+						   href="#"
+						   hx-get="{{ request.path }}?{% url_replace page=page.previous_page_number %}"
+						   hx-target="#tickets-container"
+						   hx-swap="innerHTML"
+						   hx-include="#ticket-filter-form"
+						   aria-label="Previous">
+							<span aria-hidden="true">&laquo;</span>
+						</a>
+					</li>
+				{% endif %}
+
+				{% for page_num in page_range %}
+					<li class="page-item {% if page_num == page.number %}active{% endif %}">
+						<a class="page-link"
+						   href="#"
+						   hx-get="{{ request.path }}?{% url_replace page=page_num %}"
+						   hx-target="#tickets-container"
+						   hx-swap="innerHTML"
+						   hx-include="#ticket-filter-form">{{ page_num }}
+						</a>
+					</li>
+				{% endfor %}
+
+				{% if page.has_next %}
+					<li class="page-item">
+						<a class="page-link"
+						   href="#"
+						   hx-get="{{ request.path }}?{% url_replace page=page.next_page_number %}"
+						   hx-target="#tickets-container"
+						   hx-swap="innerHTML"
+						   hx-include="#ticket-filter-form"
+						   aria-label="Next">
+							<span aria-hidden="true">&raquo;</span>
+						</a>
+					</li>
+				{% endif %}
+
+			</ul>
+		</nav>
+
+		<div class="dropdown">
+			<a class="btn btn-sm btn-outline-primary dropdown-toggle" href="#" role="button"
+			   data-bs-toggle="dropdown"
+			   aria-expanded="false">
+				{{ request.GET.per_page|default:"20" }}
+			</a>
+
+			<ul class="dropdown-menu dropdown-menu-end">
+				<li>
+					<a class="dropdown-item"
+					   href="#"
+					   hx-get="{{ request.path }}?{% url_replace page=1 per_page=5 %}"
+					   hx-target="#tickets-container"
+					   hx-swap="innerHTML"
+					   hx-include="#ticket-filter-form">5
+					</a>
+				</li>
+				<li>
+					<a class="dropdown-item"
+					   href="#"
+					   hx-get="{{ request.path }}?{% url_replace page=1 per_page=20 %}"
+					   hx-target="#tickets-container"
+					   hx-swap="innerHTML"
+					   hx-include="#ticket-filter-form">20
+					</a>
+				</li>
+				<li>
+					<a class="dropdown-item"
+					   href="#"
+					   hx-get="{{ request.path }}?{% url_replace page=1 per_page=40 %}"
+					   hx-target="#tickets-container"
+					   hx-swap="innerHTML"
+					   hx-include="#ticket-filter-form">40
+					</a>
+				</li>
+				<li>
+					<a class="dropdown-item"
+					   href="#"
+					   hx-get="{{ request.path }}?{% url_replace page=1 per_page=60 %}"
+					   hx-target="#tickets-container"
+					   hx-swap="innerHTML"
+					   hx-include="#ticket-filter-form">60
+					</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
