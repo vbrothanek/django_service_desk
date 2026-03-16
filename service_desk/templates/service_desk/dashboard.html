@@ -3,14 +3,8 @@
 {% load tz %}
 
 {% block content %}
-	<h1>Dashboard</h1>
-	<div id="ticket-list-dashboard">
-		{% include 'service_desk/include/dashboard_htmx.html' with data=data next=next %}
-	</div>
-{#	<button type="submit" name="action" value="fetch" id="btn-fetch" class="btn btn-primary">Fetch JS</button>#}
-
-{#	<button class="btn btn-primary" hx-get="/api-htmx/" hx-target="#ticket-list-dashboard">Fetch HTMX</button>#}
-
+	<h3 class="mb-0 fw-light">Dashboard</h3>
+	<hr class="opacity-25">
 
 
 {% endblock content %}

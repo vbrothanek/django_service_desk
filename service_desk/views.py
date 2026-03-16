@@ -33,49 +33,6 @@ def dashboard_view(request):
     }
     return render(request, 'service_desk/dashboard.html', context)
 
-
-@login_required
-def api_json(request):
-    per_fetch = 5
-
-    start_from = int(request.GET.get('startFrom') or 0)
-    until = start_from + per_fetch
-
-    data = Ticket.objects.values('company', 'company__name', 'ticket_number', 'assigned_to', 'user')
-    data = list(data[start_from:until])
-
-    if len(data) < per_fetch:
-        next_url = None
-    else:
-        next_url = f'/api/?startFrom={str(until)}'
-
-    return JsonResponse({
-        'data': data,
-        'next': next_url
-    })
-
-@login_required
-def api_htmx(request):
-    per_fetch = 5
-
-    start_from = int(request.GET.get('startFrom') or 0)
-    until = start_from + per_fetch
-
-    data = Ticket.objects.values('company', 'company__name', 'ticket_number', 'assigned_to', 'user')
-    data = list(data[start_from:until])
-
-    if len(data) < per_fetch:
-        next_url = None
-    else:
-        next_url = f'/api-htmx/?startFrom={str(until)}'
-
-
-    return render(request, 'service_desk/include/dashboard_htmx.html', {
-        'data': data,
-        'next': next_url
-    })
-
-
 @login_required
 def tickets_view(request):
     user_groups = request.user.groups.values_list('name', flat=True)
@@ -147,7 +104,7 @@ def tickets_view(request):
         if (is_participant and (
                 ticket.pk not in read_statuses or  # User has never read the ticket
                 (last_relevant_update and last_relevant_update > read_statuses[ticket.pk]))) \
-                or (ticket.status == StatusLevel.NEW and ticket.assigned_to is None):  # New ticket not yet assigned
+                or (ticket.status == StatusLevel.NEW and ticket.assigned_to is None and ticket.user != request.user):  # New ticket not yet assigned
             ticket.is_unread = True
         else:
             ticket.is_unread = False
@@ -286,6 +243,12 @@ def ticket_detail_view(request, ticket_number):
                         original_name=file.name,
                         uploaded_by=request.user
                     )
+
+                ticket.last_update = timezone.now()
+                ticket.last_update_internal = timezone.now()
+                ticket.last_updated_by = request.user
+                ticket.last_updated_by_internal = request.user
+                ticket.save()
 
                 return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
 

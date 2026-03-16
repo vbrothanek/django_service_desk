@@ -22,13 +22,14 @@ class TicketTable(Table):
         render_priority      - renders priority as a Bootstrap badge with color based on priority value
     """
 
-    ticket_number = columns.Column(verbose_name='Ticket Number', attrs={'th': {'style': 'width: 10%;'}})
-    subject = columns.Column(verbose_name='Subject', attrs={'th': {'style': 'width: 25%;'}})
+    ticket_number = columns.Column(verbose_name='Ticket #', attrs={'th': {'style': 'width: 7%;'}})
+    subject = columns.Column(verbose_name='Subject', attrs={'th': {'style': 'width: 28%;'}})
     status = columns.Column(verbose_name='Status', attrs={'th': {'style': 'width: 7%;'}})
     priority = columns.Column(verbose_name='Priority', attrs={'th': {'style': 'width: 7%;'}})
     assigned_to = columns.Column(verbose_name='Assigned To', attrs={'th': {'style': 'width: 10%;'}})
     company = columns.Column(verbose_name='Company', attrs={'th': {'style': 'width: 10%;'}})
     created_at = columns.Column(verbose_name='Created At', attrs={'th': {'style': 'width: 10%;'}})
+    last_update = columns.Column(verbose_name='Last update', attrs={'th': {'style': 'width: 10%;'}})
     last_update_internal = columns.Column(verbose_name='Last update', attrs={'th': {'style': 'width: 10%;'}})
 
     class Meta:
