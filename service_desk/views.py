@@ -10,6 +10,7 @@ from service_desk.forms import TicketForm, TicketAttachmentForm, TicketDetailFor
     NewRecordForm, RecordEditForm
 from django.core.paginator import Paginator
 from .tables import TicketTable, RecordTable
+from django.db.models import Max
 
 
 @login_required
@@ -401,3 +402,37 @@ def record_delete_view(request, ticket_number, pk):
       return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
 
     return HttpResponseForbidden()
+
+
+@login_required
+def tickets_poll_view(request):
+    """
+    Returns the latest ticket update timestamp as JSON for client-side polling.
+
+    Queries the database using aggregate MAX() to get the most recent timestamp
+    in a single SQL query without loading all records into memory.
+
+    For agents, both last_update and last_update_internal are considered —
+    filter(None, [...]) removes any None values before comparing,
+    and max() picks the more recent of the two timestamps.
+    For non-agents, only last_update (public records) is checked.
+
+    Returns: JSON {'ts': '<isoformat timestamp>'} or {'ts': ''} if no tickets exist.
+    """
+    user_groups = request.user.groups.values_list('name', flat=True)
+    is_agent = 'Agents' in user_groups
+
+    if is_agent:
+        tickets = Ticket.objects.all()
+    else:
+        tickets = Ticket.objects.filter(company__in=request.user.companies.all())
+
+    if is_agent:
+        agg = tickets.aggregate(last=Max('last_update'), last_internal=Max('last_update_internal'))
+        latest = max(filter(None, [agg['last'], agg['last_internal']]), default=None)
+    else:
+        latest = tickets.aggregate(last=Max('last_update'))['last']
+
+    ts = latest.isoformat() if latest else ''
+
+    return JsonResponse({'ts': ts})
