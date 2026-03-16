@@ -37,7 +37,7 @@ class TicketTable(Table):
         fields = ('ticket_number', 'subject', 'status', 'priority', 'assigned_to', 'company', 'created_at',
                   'last_update', 'last_update_internal')
         attrs = {
-            "class": "table table-sm table-hover tickets-table table-striped",
+            "class": "table table-sm table-hover tickets-table table-bordered table-striped",
             "thead": {"class": "pt-4"},
         }
         """
@@ -96,7 +96,7 @@ class RecordTable(Table):
     user = columns.Column(attrs={'th': {'style': 'width: 10%;'}})
     created_at = columns.Column(attrs={'th': {'style': 'width: 10%;'}})
     is_internal = columns.Column(verbose_name="Is internal", attrs={'th': {'style': 'width: 7%;'}})
-    actions = columns.Column(empty_values=(), verbose_name='', orderable=False, attrs={'th': {'style': 'width: 5%;'}})
+    actions = columns.Column(empty_values=(), verbose_name='Actions', orderable=False, attrs={'th': {'style': 'width: 4%; color: white;'}})
 
     def __init__(self, *args, **kwargs):
         self.current_user = kwargs.pop('current_user', None)
@@ -108,7 +108,7 @@ class RecordTable(Table):
         template_name = "django_tables2/bootstrap5.html"
         fields = ['message', 'user', 'is_internal', 'created_at', 'actions']
         attrs = {
-            "class": "table table-sm table-hover records-table",
+            "class": "table table-sm table-hover table-bordered records-table",
         }
 
     def render_created_at(self, value, record):
