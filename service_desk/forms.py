@@ -100,7 +100,7 @@ class TicketDetailForm(forms.ModelForm):
 
         # If user is not an agent, render company, priority, assigned_to, status, due_date and subject as read-only - DISABLED.
         if not is_agent:
-            readonly_fields = ['company', 'priority', 'assigned_to', 'status', 'due_date', 'subject']
+            readonly_fields = ['company', 'priority', 'assigned_to', 'status', 'due_date', 'subject', 'description']
             for field_name in readonly_fields:
                 self.fields[field_name].disabled = True
 
