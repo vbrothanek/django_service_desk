@@ -118,9 +118,9 @@ class RecordTable(Table):
 
     def render_message(self, value, record):
         return format_html(
-            '<div id="record-{}" '
+            '<div class="record-message" id="record-{}" '
             'style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" '
-            'onclick="this.style.whiteSpace = this.style.whiteSpace === \'normal\' ? \'nowrap\' : \'normal\'">'
+            'onclick="this.style.whiteSpace = this.style.whiteSpace === \'pre-wrap\' ? \'nowrap\' : \'pre-wrap\'">'
             '{}'
             '</div>',
             record.pk, value

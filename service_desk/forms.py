@@ -164,7 +164,7 @@ class NewRecordForm(forms.ModelForm):
                     Column('user', css_class='col-12 col-lg-4 pb-1'),
                     Column('is_internal', css_class='col-12 col-lg-3 pb-1 mt-4'),
                     css_class='align-items-center'),
-                Row(Column('message'))
+                Row(Column('message', css_class='col-12'),)
             )
         else:
             self.helper.layout = Layout(
