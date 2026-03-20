@@ -25,7 +25,7 @@ class Company(models.Model):
 
 class User(AbstractUser):
     phone = models.CharField(max_length=16, blank=True)
-    companies = models.ManyToManyField(Company)
+    companies = models.ManyToManyField(Company, related_name='users')
 
 
 class PriorityType(models.IntegerChoices):
@@ -61,6 +61,7 @@ class Ticket(models.Model):
     due_date = models.DateField(blank=True, null=True)
     date_of_completion = models.DateField(blank=True, null=True)
     followers = models.ManyToManyField(User, related_name='followed_tickets', blank=True)
+    requester = models.ForeignKey(User, related_name='requested_tickets', on_delete=models.SET_NULL, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         '''

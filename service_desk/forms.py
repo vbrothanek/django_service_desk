@@ -10,33 +10,50 @@ from service_desk.services import validate_attachment
 class TicketForm(forms.ModelForm):
     class Meta:
         model = Ticket
-        fields = ['company', 'subject', 'description', 'priority', 'due_date']
+        fields = ['company', 'subject', 'description', 'priority', 'due_date', 'requester']
         widgets = {
             'due_date': forms.DateInput(attrs={'type': 'date'}),
-            'company': forms.Select(attrs={'class': 'tom-select-company', 'placeholder': 'Select company...'}),
-            'priority': forms.Select(attrs={'class': 'tom-select-priority'})
+            'company': forms.Select(attrs={
+                'class': 'tom-select-company',
+                'placeholder': 'Select company...',
+            }),
+            'priority': forms.Select(attrs={'class': 'tom-select-priority'}),
+            'requester': forms.Select(attrs={'class': 'tom-select-requester', 'disabled': True}),
         }
 
     def __init__(self, *args, **kwargs):
+        is_agent = kwargs.pop('is_agent', False)
+
         super().__init__(*args, **kwargs)
         self.fields['company'].empty_label = ''
+        self.fields['requester'].empty_label = ''
+        self.fields['requester'].queryset = User.objects.none()
         self.helper = FormHelper()
         self.helper.form_tag = False
-        self.helper.layout = Layout(
-            Row(
-                Column('company', css_class='col-12 col-lg-4'),
-                Column('priority', css_class='col-12 col-lg-2')),
-            Row(Column('subject', css_class='col-12 col-lg-6')),
-            Row(Column('description', css_class='col-12 col-lg-6')),
-            Row(Column('due_date', css_class='col-12 col-lg-2')),
-            )
+
+        if is_agent:
+            self.helper.layout = Layout(
+                Row(
+                    Column('company', css_class='col-12 col-lg-4'),
+                    Column('priority', css_class='col-12 col-lg-2')),
+                Row(Column('subject', css_class='col-12 col-lg-6')),
+                Row(Column('description', css_class='col-12 col-lg-6')),
+                Row(Column('due_date', css_class='col-12 col-lg-2'),
+                    Column('requester', css_class='col-12 col-lg-2')),)
+        else:
+            self.helper.layout = Layout(
+                Row(
+                    Column('company', css_class='col-12 col-lg-4'),
+                    Column('priority', css_class='col-12 col-lg-2')),
+                Row(Column('subject', css_class='col-12 col-lg-6')),
+                Row(Column('description', css_class='col-12 col-lg-6')),
+                Row(Column('due_date', css_class='col-12 col-lg-2')))
 
 
 
 """
 Upload multiple file input by official documentation of Django. 
 """
-
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
@@ -85,7 +102,8 @@ class TicketDetailForm(forms.ModelForm):
         fields = ['company', 'subject', 'description', 'priority', 'due_date', 'status', 'assigned_to']
         widgets = {
             'due_date': forms.DateInput(attrs={'type': 'date'}),
-            'company': forms.Select(attrs={'class': 'tom-select-company-ticket-detail', 'placeholder': 'Select company...'}),
+            'company': forms.Select(
+                attrs={'class': 'tom-select-company-ticket-detail', 'placeholder': 'Select company...'}),
             'priority': forms.Select(attrs={'class': 'tom-select-priority'}),
             'status': forms.Select(attrs={'class': 'tom-select-status-ticket-detail'}),
             'assigned_to': forms.Select(attrs={'class': 'tom-select-assigned-ticket-detail'})
@@ -118,7 +136,7 @@ class TicketDetailForm(forms.ModelForm):
             Row(Column('subject'),
                 Column('assigned_to', css_class='col-12 col-lg-3'), css_class='row align-items-end'),
             Row(Column('description'))
-            )
+        )
 
 
 class TicketDetailFollowersForm(forms.ModelForm):
@@ -126,7 +144,8 @@ class TicketDetailFollowersForm(forms.ModelForm):
         model = Ticket
         fields = ['followers']
         widgets = {
-            'followers': forms.SelectMultiple(attrs={'class': 'tom-select-followers', 'placeholder': 'Select followers...'}),
+            'followers': forms.SelectMultiple(
+                attrs={'class': 'tom-select-followers', 'placeholder': 'Select followers...'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -164,13 +183,13 @@ class NewRecordForm(forms.ModelForm):
                     Column('user', css_class='col-12 col-lg-4 pb-1'),
                     Column('is_internal', css_class='col-12 col-lg-3 pb-1 mt-4'),
                     css_class='align-items-center'),
-                Row(Column('message', css_class='col-12'),)
+                Row(Column('message', css_class='col-12'), )
             )
         else:
             self.helper.layout = Layout(
                 Row(
                     Column('user', css_class='col-12 col-lg-4 pb-1'),
-                Row(Column('message')))
+                    Row(Column('message')))
             )
 
 
@@ -206,6 +225,6 @@ class RecordEditForm(forms.ModelForm):
         else:
             self.helper.layout = Layout(
                 Row(Column('user', css_class='col-12 col-lg-4 pb-1'),
-                Row(Column('message'))
+                    Row(Column('message'))
                     )
             )

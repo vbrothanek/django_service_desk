@@ -143,16 +143,17 @@ def tickets_view(request):
 @login_required
 def create_ticket_view(request):
     user_groups = request.user.groups.values_list('name', flat=True)
+    is_agent = 'Agents' in user_groups
 
     # Specify the queryset of company by the role of the user.
-    if 'Agents' in user_groups:
+    if is_agent:
         companies = Company.objects.filter(is_active=True)
     else:
         companies = request.user.companies.filter(is_active=True)
 
 
     if request.method == 'GET':
-        form = TicketForm()
+        form = TicketForm(is_agent=is_agent)
         form.fields['company'].queryset = companies
 
         # If user only have access to one company, automatically fill the filed
@@ -160,8 +161,9 @@ def create_ticket_view(request):
             form.fields['company'].initial = companies.first()
 
         attachment_form = TicketAttachmentForm()
+
     else:
-        form = TicketForm(request.POST)
+        form = TicketForm(request.POST, is_agent=is_agent)
         form.fields['company'].queryset = companies
         attachment_form = TicketAttachmentForm(request.POST, request.FILES)
         if form.is_valid():
@@ -189,6 +191,7 @@ def create_ticket_view(request):
         'active_page': 'tickets_create',
         'form': form,
         'attachment_form': attachment_form,
+        'is_agent': is_agent,
     }
 
     return render(request, 'service_desk/create_ticket_form.html', context)
@@ -408,3 +411,12 @@ def tickets_poll_view(request):
     ts = latest.isoformat() if latest else ''
 
     return JsonResponse({'ts': ts})
+
+def company_requesters_view(request, company_id):
+    company = get_object_or_404(Company, pk=company_id)
+    print('company', company)
+    user_list = company.users.all()
+    print('user_list', user_list)
+    context = {'users': user_list}
+
+    return render(request, 'service_desk/include/requester_options.html', context)
