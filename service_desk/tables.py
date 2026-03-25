@@ -29,14 +29,17 @@ class TicketTable(Table):
     assigned_to = columns.Column(verbose_name='Assigned To', attrs={'th': {'style': 'width: 10%;'}})
     company = columns.Column(verbose_name='Company', attrs={'th': {'style': 'width: 10%;'}})
     created_at = columns.Column(verbose_name='Created At', attrs={'th': {'style': 'width: 10%;'}})
+    requester = columns.Column(verbose_name='Created By', attrs={'th': {'style': 'width: 10%;'}})
     last_update = columns.Column(verbose_name='Last update', attrs={'th': {'style': 'width: 10%;'}})
     last_update_internal = columns.Column(verbose_name='Last update', attrs={'th': {'style': 'width: 10%;'}})
+
+    # ticket_number = columns.Column(verbose_name='Ticket #', attrs={'th': {'style': 'width: 100px;'}})
 
     class Meta:
         model = Ticket
         template_name = "django_tables2/bootstrap5.html"
-        fields = ('ticket_number', 'subject', 'status', 'priority', 'assigned_to', 'company', 'created_at',
-                  'last_update', 'last_update_internal')
+        fields = ('ticket_number', 'subject', 'status', 'priority', 'assigned_to', 'company', 'requester', 'created_at',
+                  'last_update', 'last_update_internal',)
         attrs = {
             "class": "table table-sm table-hover tickets-table table-bordered table-striped",
             "thead": {"class": "pt-4"},

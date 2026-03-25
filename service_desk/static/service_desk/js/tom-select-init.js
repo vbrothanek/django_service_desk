@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
             items: [],
         });
 
-        ts.on('change', (value) => {d
+        ts.on('change', (value) => {
             console.log(value);
             if (!value) {
                 return;
@@ -51,8 +51,43 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
     document.querySelectorAll('select.tom-select-company-ticket-detail').forEach(select => {
-        new TomSelect(select, {
+        const ts = new TomSelect(select, {
             allowEmptyOption: true,
+        });
+
+        ts.on('change', (value) => {
+            console.log(value);
+            if (!value) {
+                return;
+            }
+
+            const url = `/api/company/${value}/requesters/`
+
+            const requesterEl = document.querySelector('select.tom-select-requester');
+            if (requesterEl && requesterEl.tomselect) {
+                requesterEl.tomselect.destroy();
+            }
+
+            /**
+             * Destroys the existing TomSelect instance on the requester field,
+             * fetches requester options for the selected company from the API,
+             * injects the returned HTML options into the requester select field,
+             * removes the disabled attribute and re-initializes TomSelect.
+             *
+             * @param {string} url - The API endpoint URL for fetching company requesters
+             * @param {HTMLElement} requesterEl - The requester select element
+             */
+
+            htmx.ajax('GET', url, {
+                target: '#id_requester',
+                swap: 'innerHTML'
+            }).then(() => {
+                requesterEl.removeAttribute('disabled');
+                new TomSelect(requesterEl, {
+                    allowEmptyOption: true,
+                    controlInput: null
+                });
+            })
         })
     })
 

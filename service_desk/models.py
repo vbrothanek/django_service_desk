@@ -27,6 +27,9 @@ class User(AbstractUser):
     phone = models.CharField(max_length=16, blank=True)
     companies = models.ManyToManyField(Company, related_name='users')
 
+    def __str__(self):
+        return self.get_full_name() or self.username
+
 
 class PriorityType(models.IntegerChoices):
     LOW = 10, 'Low'

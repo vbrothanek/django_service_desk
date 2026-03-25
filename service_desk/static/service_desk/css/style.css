@@ -75,9 +75,9 @@ body {
 /* Constrain the table wrapper height to the visible viewport so the
    table scrolls vertically inside the container. The horizontal scrollbar
    is always visible at the bottom of the wrapper, not at the bottom of
-   the full page. Adjust the offset (200px) to match your header height. */
+   the full page. Adjust the offset (180px) to match your header height. */
 .table-responsive {
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 180px);
     overflow-y: auto;
 }
 

@@ -28,6 +28,14 @@ class TicketForm(forms.ModelForm):
         self.fields['company'].empty_label = ''
         self.fields['requester'].empty_label = ''
         self.fields['requester'].queryset = User.objects.none()
+
+        if self.data.get('company'):
+            try:
+                company_id = int(self.data.get('company'))
+                self.fields['requester'].queryset = User.objects.filter(companies__id=company_id)
+            except (ValueError, TypeError):
+                pass
+
         self.helper = FormHelper()
         self.helper.form_tag = False
 
@@ -99,14 +107,15 @@ class TicketAttachmentForm(forms.Form):
 class TicketDetailForm(forms.ModelForm):
     class Meta:
         model = Ticket
-        fields = ['company', 'subject', 'description', 'priority', 'due_date', 'status', 'assigned_to']
+        fields = ['company', 'subject', 'description', 'priority', 'due_date', 'status', 'assigned_to', 'requester']
         widgets = {
             'due_date': forms.DateInput(attrs={'type': 'date'}),
             'company': forms.Select(
                 attrs={'class': 'tom-select-company-ticket-detail', 'placeholder': 'Select company...'}),
             'priority': forms.Select(attrs={'class': 'tom-select-priority'}),
             'status': forms.Select(attrs={'class': 'tom-select-status-ticket-detail'}),
-            'assigned_to': forms.Select(attrs={'class': 'tom-select-assigned-ticket-detail'})
+            'assigned_to': forms.Select(attrs={'class': 'tom-select-assigned-ticket-detail'}),
+            'requester': forms.Select(attrs={'class': 'tom-select-requester'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -115,10 +124,20 @@ class TicketDetailForm(forms.ModelForm):
         self.fields['company'].empty_label = ''
         self.fields['assigned_to'].empty_label = ''
         self.fields['assigned_to'].queryset = User.objects.filter(groups__name='Agents')
+        self.fields['requester'].queryset = User.objects.none()
+
+        if self.data.get('company'):
+            try:
+                company_id = int(self.data.get('company'))
+                self.fields['requester'].queryset = User.objects.filter(companies__id=company_id)
+            except (ValueError, TypeError):
+                pass
+        elif self.instance and self.instance.pk and self.instance.company:
+            self.fields['requester'].queryset = User.objects.filter(companies=self.instance.company)
 
         # If user is not an agent, render company, priority, assigned_to, status, due_date and subject as read-only - DISABLED.
         if not is_agent:
-            readonly_fields = ['company', 'priority', 'assigned_to', 'status', 'due_date', 'subject', 'description']
+            readonly_fields = ['company', 'priority', 'assigned_to', 'status', 'due_date', 'subject', 'description', 'requester']
             for field_name in readonly_fields:
                 self.fields[field_name].disabled = True
 
@@ -133,8 +152,12 @@ class TicketDetailForm(forms.ModelForm):
                 Column('due_date'),
                 Column('priority'),
                 Column('status')),
-            Row(Column('subject'),
-                Column('assigned_to', css_class='col-12 col-lg-3'), css_class='row align-items-end'),
+            Row(
+                Column('assigned_to', css_class='col-12 col-lg-3'),
+                Column('requester', css_class='col-12 col-lg-3'),
+                css_class='row align-items-end'
+            ),
+            Row(Column('subject')),
             Row(Column('description'))
         )
 

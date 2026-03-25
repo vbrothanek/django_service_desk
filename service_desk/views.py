@@ -166,6 +166,7 @@ def create_ticket_view(request):
         form = TicketForm(request.POST, is_agent=is_agent)
         form.fields['company'].queryset = companies
         attachment_form = TicketAttachmentForm(request.POST, request.FILES)
+
         if form.is_valid():
             instance = form.save(commit=False)
             instance.user = request.user
@@ -173,6 +174,10 @@ def create_ticket_view(request):
             instance.last_update_internal = timezone.now()
             instance.last_updated_by = request.user
             instance.last_updated_by_internal = instance.user
+
+            if not is_agent:
+                instance.requester = request.user
+
             instance.save()
 
             for file in request.FILES.getlist('file'):
