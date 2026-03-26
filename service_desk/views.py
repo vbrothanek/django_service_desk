@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from service_desk.forms import TicketForm, TicketAttachmentForm, TicketDetailForm, TicketDetailFollowersForm, \
     NewRecordForm, RecordEditForm
 from django.core.paginator import Paginator
+from .notifications import send_record_notification
 from .tables import TicketTable, RecordTable
 from django.db.models import Max
 
@@ -338,6 +339,9 @@ def record_create_view(request, ticket_number):
             record.user = request.user
             record.save()
 
+            if request.POST.get('action') == 'save_and_send':
+                send_record_notification(record)
+
             return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
 
     return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
@@ -355,6 +359,10 @@ def record_edit_view(request, ticket_number, pk):
 
         if form.is_valid():
             form.save()
+
+            if request.POST.get('action') == 'save_and_send':
+                send_record_notification(record)
+
             return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
 
     else:
@@ -380,6 +388,20 @@ def record_delete_view(request, ticket_number, pk):
     if request.method == 'POST':
       record.delete()
       return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
+
+    return HttpResponseForbidden()
+
+@login_required
+def record_send_mail_view(request, ticket_number, pk):
+    record = get_object_or_404(Record, pk=pk)
+    is_agent = 'Agents' in request.user.groups.values_list('name', flat=True)
+
+    if not is_agent:
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        send_record_notification(record)
+        return redirect('service_desk:ticket_detail', ticket_number=ticket_number)
 
     return HttpResponseForbidden()
 

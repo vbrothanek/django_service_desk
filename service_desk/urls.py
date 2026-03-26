@@ -13,5 +13,6 @@ urlpatterns = [
     path('tickets/<int:ticket_number>/records/create/', views.record_create_view, name='record_create'), #Create new record
     path('tickets/<int:ticket_number>/records/<int:pk>/edit', views.record_edit_view, name='record_edit'), #Edit record
     path('tickets/<int:ticket_number>/records/<int:pk>/delete', views.record_delete_view, name='record_delete'), #Delete record
-    path('api/company/<int:company_id>/requesters/', views.company_requesters_view, name='comapny_requestsers'), #API get company requesters
+    path('tickets/<int:ticket_number>/records/<int:pk>/send-mail', views.record_send_mail_view, name='record_send_mail'), #Delete record
+    path('api/company/<int:company_id>/requesters/', views.company_requesters_view, name='company_requesters'), #API get company requesters
 ]

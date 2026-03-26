@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Customer email</title>
+</head>
+<body>
+
+	<p>Hello,</p>
+
+	<p>Your request <strong>"{{ ticket.subject }}"</strong> has been created with ticket number <strong>[#{{ ticket.ticket_number }}]</strong>.</p>
+
+	<p>Company: <strong>{{ ticket.company }}</strong><br>
+		Requester: <strong>{{ ticket.requester }}</strong><br>
+		Due Date: <strong>{{ ticket.due_date|date:"M d, Y" }}</strong><br>
+		Priority: <strong>{{ ticket.get_priority_display }}</strong><br>
+		Status: <strong>{{ ticket.get_status_display }}</strong><br>
+		<a href="{{ ticket_url }}">Open ticket detail [#{{ ticket.ticket_number }}]</a>
+	</p>
+
+
+	<hr>
+
+	<p style="white-space: pre-wrap;">Description:<br><br> {{ ticket.description }}</p>
+
+
+
+	<p>Thank you for contacting us,<br>
+		Service Desk</p>
+
+</body>
+</html>

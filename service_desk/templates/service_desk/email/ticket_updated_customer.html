@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Updated Customer</title>
+</head>
+<body>
+	<p>Hello,</p>
+
+	<p>Request <strong>"{{ ticket.subject }}"</strong> has been updated.</p>
+
+	<p>Company: <strong>{{ ticket.company }}</strong><br>
+		Requester: <strong>{{ ticket.requester }}</strong><br>
+		Due Date: <strong>{{ ticket.due_date|date:"M d, Y" }}</strong><br>
+		Priority: <strong>{{ ticket.get_priority_display }}</strong><br>
+		Status: <strong>{{ ticket.get_status_display }}</strong><br>
+		Updated by: <strong>{{ ticket.last_updated_by.get_full_name }}</strong><br>
+		<a href="{{ ticket_url }}">Open ticket detail [#{{ ticket.ticket_number }}]</a>
+	</p>
+
+	<p style="white-space: pre-wrap;">Thank you for contacting us,<br>
+		Service Desk</p>
+
+</body>
+</html>

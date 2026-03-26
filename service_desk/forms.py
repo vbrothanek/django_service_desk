@@ -183,6 +183,7 @@ class NewRecordForm(forms.ModelForm):
         fields = ['user', 'is_internal', 'message']
         widgets = {
             'message': forms.Textarea(attrs={'placeholder': 'Message...'}),
+            'is_internal': forms.CheckboxInput(attrs={'class': 'form-check-input', 'role': 'switch'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -204,7 +205,7 @@ class NewRecordForm(forms.ModelForm):
             self.helper.layout = Layout(
                 Row(
                     Column('user', css_class='col-12 col-lg-4 pb-1'),
-                    Column('is_internal', css_class='col-12 col-lg-3 pb-1 mt-4'),
+                    # Column('is_internal', css_class='col-12 col-lg-3 pb-1 mt-4'),
                     css_class='align-items-center'),
                 Row(Column('message', css_class='col-12'), )
             )
@@ -222,6 +223,7 @@ class RecordEditForm(forms.ModelForm):
         fields = ['user', 'is_internal', 'message']
         widgets = {
             'message': forms.Textarea(attrs={'placeholder': 'Message...'}),
+            'is_internal': forms.CheckboxInput(attrs={'class': 'form-check-input', 'role': 'switch'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -241,7 +243,7 @@ class RecordEditForm(forms.ModelForm):
             self.helper.layout = Layout(
                 Row(
                     Column('user', css_class='col-12 col-lg-4 pb-1'),
-                    Column('is_internal', css_class='col-12 col-lg-3 pb-1 mt-4'),
+                    # Column('is_internal', css_class='col-12 col-lg-3 pb-1 mt-4'),
                     css_class='align-items-center'),
                 Row(Column('message')),
             )

@@ -140,8 +140,11 @@ class RecordTable(Table):
     def render_actions(self, record):
         can_edit = self.is_agent or (self.current_user and record.user == self.current_user)
         can_delete = self.is_agent
+        can_send_email = self.is_agent and not record.is_internal and not record.user.groups.filter(name__in=['Customers', 'Managers']).exists()
+
         edit_url = reverse('service_desk:record_edit', args=[record.ticket.ticket_number, record.pk])
         delete_url = reverse('service_desk:record_delete', args=[record.ticket.ticket_number, record.pk])
+        send_mail_url = reverse('service_desk:record_send_mail', args=[record.ticket.ticket_number, record.pk])
 
         if can_edit:
             edit_html = f'<a hx-get="{edit_url}" hx-target="#record-edit-modal-content" hx-swap="innerHTML" '\
@@ -152,10 +155,17 @@ class RecordTable(Table):
                         '<span class="material-symbols-outlined">edit</span></span>'
 
         if can_delete:
-            delete_html = f'<a class="record-action-btn record-action-delete" data-delete-url="{delete_url}" style="cursor:pointer;">'\
+            delete_html = f'<a class="record-action-btn record-action-delete me-2" data-delete-url="{delete_url}" style="cursor:pointer;">'\
                           f'<span class="material-symbols-outlined">delete</span></a>'
         else:
-            delete_html = '<span class="record-action-btn record-action-disabled" style="cursor:pointer;">'\
+            delete_html = '<span class="record-action-btn record-action-disabled me-2 style="cursor:pointer;">'\
                          '<span class="material-symbols-outlined">delete</span></span>'
 
-        return mark_safe(edit_html + delete_html)
+        if can_send_email:
+            send_mail_html = f'<a class="record-action-btn record-action-send-mail" data-send-mail-url="{send_mail_url}" style="cursor:pointer;">'\
+                             f'<span class="material-symbols-outlined">forward_to_inbox</span></a>'
+        else:
+            send_mail_html = '<span class="record-action-btn record-action-disabled" style="cursor:pointer;">'\
+                             '<span class="material-symbols-outlined">forward_to_inbox</span></span>'
+
+        return mark_safe(edit_html + delete_html + send_mail_html)

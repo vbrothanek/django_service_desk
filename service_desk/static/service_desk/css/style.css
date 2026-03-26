@@ -345,6 +345,10 @@ body {
     color: #dc3545;
 }
 
+.record-action-send-mail:hover {
+    color: var(--color-primary);
+}
+
 .record-action-disabled {
     color: #dee2e6;
     cursor: default;

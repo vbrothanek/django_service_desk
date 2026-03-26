@@ -14,6 +14,17 @@ document.addEventListener('click', function (e) {
     }
 });
 
+
+// Send mail modal — set form action and open
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('[data-send-mail-url]');
+    if (btn) {
+        document.getElementById('record-send-mail-form').action = btn.dataset.sendMailUrl;
+        new bootstrap.Modal(document.getElementById('record-send-mail-modal')).show();
+    }
+});
+
+
 // Expand all toggle
 document.getElementById('toggle-records')?.addEventListener('change', function () {
     document.querySelectorAll('[id^="record-"]').forEach(el => {
@@ -57,4 +68,26 @@ document.addEventListener('htmx:afterSwap', function (e) {
         }, {once: true});
     }
 });
+
+
+// Disable "Save & Send" button when "Internal Record" checkbox is checked,
+// as internal records should not be sent to the customer.
+const isInternal = document.getElementById('id_is_internal');
+const saveAndSendBtn = document.getElementById('save_and_send_btn');
+
+if (isInternal) {
+    isInternal.addEventListener('change', event => {
+        saveAndSendBtn.disabled = event.target.checked;
+    });
+    saveAndSendBtn.disabled = isInternal.checked
+}
+
+// Add class form-switch to wrapper of is internal input check field.
+// Check if exists isInternalWraper (closest class form-check, if exists add to it's class .form-switch.
+const isInternalWrapper = document.querySelector('#id_is_internal')?.closest('.form-check');
+if (isInternalWrapper) {
+    isInternalWrapper.classList.add('form-switch');
+}
+
+
 

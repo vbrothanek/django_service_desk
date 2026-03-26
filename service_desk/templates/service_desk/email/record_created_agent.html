@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Record created agent</title>
+</head>
+<body>
+
+	<p>New record in <strong>[#{{ ticket.ticket_number }}]</strong>, <strong>"{{ ticket.subject }}"</strong>.</p>
+
+	<p>Company: <strong>{{ ticket.company }}</strong><br>
+		Requester: <strong>{{ ticket.requester }}</strong><br>
+		Due Date: <strong>{{ ticket.due_date|date:"M d, Y" }}</strong><br>
+		Priority: <strong>{{ ticket.get_priority_display }}</strong><br>
+		Status: <strong>{{ ticket.get_status_display }}</strong><br>
+		<a href="{{ ticket_url }}">Open ticket detail [#{{ ticket.ticket_number }}]</a>
+	</p>
+
+	<hr>
+
+	<p style="white-space: pre-wrap;">Created by: <strong>{{ record.user.get_full_name }}</strong><br><br>
+		{{ record.message }}
+	</p>
+</body>
+</html>
