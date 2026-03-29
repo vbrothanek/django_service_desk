@@ -133,4 +133,15 @@ class TicketReadStatus(models.Model):
         return f"{self.user} - {self.ticket} ({self.last_read_at})"
 
 
+class ServiceDeskSettings(models.Model):
+    notification_enabled = models.BooleanField(default=True) # Turn ON/OFF all notifications
+    central_notification_enabled = models.BooleanField(default=False) # If notifications should be send only on central emails
+    agent_notification_enabled = models.BooleanField(default=False) # If notifications should be send to agents email
+
+
+class ServiceDeskEmail(models.Model):
+    service_desk = models.ForeignKey(ServiceDeskSettings, related_name='emails', on_delete=models.CASCADE)
+    email = models.EmailField(max_length=200)
+
+
 

@@ -1,6 +1,85 @@
 {% extends 'service_desk/_base.html' %}
+{% load static %}
 {% load tz %}
 
+{% block extra_head %}
+	<link rel="stylesheet" href="{% static 'service_desk/css/tom-select.bootstrap5.min.css' %}">
+{% endblock extra_head %}
+
 {% block content %}
-	<h1>Settings</h1>
+	<h3 class="mb-0 fw-light">Settings</h3>
+	<hr class="opacity-25">
+
+	<div class="settings-page">
+		<form method="post">
+			{% csrf_token %}
+
+			<div class="mb-3 settings-option">
+				<div class="settings-option-grid">
+					<div>
+						<label class="form-check-label" for="id_notification_enabled">Enable notifications</label>
+						<p class="text-muted small fst-italic mb-0">Enables or disables all email notifications
+							system-wide.</p>
+					</div>
+					<div class="form-check form-switch d-flex align-items-center ms-4">
+						<input class="form-check-input" type="checkbox" role="switch"
+							   name="notification_enabled" id="id_notification_enabled"
+							   {% if form.notification_enabled.value %}checked{% endif %}>
+					</div>
+				</div>
+			</div>
+
+			<div class="mb-3 settings-option">
+				<div class="settings-option-grid">
+					<div>
+						<label class="form-check-label" for="id_central_notification_enabled">Send to central emails
+							only</label>
+						<p class="text-muted small fst-italic mb-0">When enabled, notifications are sent only to the
+							central email addresses defined below.</p>
+					</div>
+					<div class="form-check form-switch d-flex align-items-center ms-4">
+						<input id="central-emails-switcher" class="form-check-input" type="checkbox" role="switch"
+							   name="central_notification_enabled" id="id_central_notification_enabled"
+							   {% if form.central_notification_enabled.value %}checked{% endif %}>
+					</div>
+				</div>
+			</div>
+
+			<div class="mb-3 settings-option" id="settings-emails-filed" {% if not form.central_notification_enabled.value %}hidden{% endif %}>
+				<label class="form-check-label mb-1" for="id_email_address">Central email addresses</label>
+				<p class="text-muted small fst-italic mb-2">Emails that will receive notifications when central
+					notifications are enabled.</p>
+				<select id="tom-select-central-emails" class="tom-select-central-emails" name="central_emails" multiple>
+					{% for email in existing_emails %}
+						<option value="{{ email.email }}" selected>{{ email.email }}</option>
+					{% endfor %}
+				</select>
+			</div>
+
+			<div class="mb-3 settings-option">
+				<div class="settings-option-grid">
+					<div>
+						<label class="form-check-label" for="id_agent_notification_enabled">Send to agents
+							directly</label>
+						<p class="text-muted small fst-italic mb-0">When enabled, notifications are also sent directly
+							to the assigned agent's email address.</p>
+					</div>
+					<div class="form-check form-switch d-flex align-items-center ms-4">
+						<input class="form-check-input" type="checkbox" role="switch"
+							   name="agent_notification_enabled" id="id_agent_notification_enabled"
+							   {% if form.agent_notification_enabled.value %}checked{% endif %}>
+					</div>
+				</div>
+			</div>
+
+			<button type="submit" class="btn btn-primary mt-3">Save</button>
+
+		</form>
+	</div>
 {% endblock content %}
+
+{% block extra_js %}
+	<script defer src="{% static 'service_desk/js/tom-select.complete.min.js' %}"></script>
+	<script defer src="{% static 'service_desk/js/tom-select-init.js' %}"></script>
+	<script defer src="{% static 'service_desk/js/settings-page.js' %}"></script>
+{% endblock extra_js %}

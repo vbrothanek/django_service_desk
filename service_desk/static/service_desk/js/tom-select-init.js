@@ -143,5 +143,14 @@ document.addEventListener("DOMContentLoaded", () => {
             controlInput: null,
         })
     })
+
+    document.querySelectorAll('select.tom-select-central-emails').forEach(select => {
+        new TomSelect(select, {
+            create: true,
+            createOnBlur: true,
+            allowEmptyOption: true,
+            plugins: ['remove_button'],
+        })
+    })
 })
 

@@ -629,3 +629,21 @@ body {
     font-size: 22px;
     color: #adb5bd;
 }
+
+.settings-page {
+    font-size: 14px;
+}
+
+.settings-page .ts-wrapper.multi .ts-control {
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.settings-option {
+    max-width: 600px;
+}
+
+.settings-option-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+}

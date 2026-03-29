@@ -4,10 +4,11 @@ from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django_tables2 import RequestConfig
 from .filters import TicketFilter, RecordFilter
-from .models import Ticket, Company, Record, TicketReadStatus, TicketAttachment, StatusLevel
+from .models import Ticket, Company, Record, TicketReadStatus, TicketAttachment, StatusLevel, ServiceDeskSettings, \
+    ServiceDeskEmail
 from django.contrib.auth.decorators import login_required
 from service_desk.forms import TicketForm, TicketAttachmentForm, TicketDetailForm, TicketDetailFollowersForm, \
-    NewRecordForm, RecordEditForm
+    NewRecordForm, RecordEditForm, ServiceDeskSettingsForm
 from django.core.paginator import Paginator
 from .notifications import send_record_notification
 from .tables import TicketTable, RecordTable
@@ -439,6 +440,8 @@ def tickets_poll_view(request):
 
     return JsonResponse({'ts': ts})
 
+
+@login_required
 def company_requesters_view(request, company_id):
     company = get_object_or_404(Company, pk=company_id)
     print('company', company)
@@ -447,3 +450,31 @@ def company_requesters_view(request, company_id):
     context = {'users': user_list}
 
     return render(request, 'service_desk/include/requester_options.html', context)
+
+
+@login_required
+def settings_view(request):
+    instance, _ = ServiceDeskSettings.objects.get_or_create(pk=1) # get_or_create returns (instance, created (boolean))
+
+    if request.method == 'POST':
+        form = ServiceDeskSettingsForm(request.POST, instance=instance)
+        if form.is_valid():
+            instance = form.save()
+            new_emails = request.POST.getlist('central_emails') #Get new emails from emails field
+            instance.emails.all().delete() #Delete all old emails
+
+            for email in new_emails:
+                ServiceDeskEmail.objects.create(service_desk=instance, email=email) #Settings is ServiceDeskSettings as ForeignKey.
+
+            return redirect('service_desk:settings')
+    else:
+        form = ServiceDeskSettingsForm(instance=instance)
+
+    existing_emails = instance.emails.all() if instance else []
+
+    context = {
+        'form': form,
+        'existing_emails': existing_emails,
+    }
+
+    return render(request, 'service_desk/settings.html', context)

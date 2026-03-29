@@ -1,9 +1,7 @@
-from cProfile import label
-from crispy_forms.templatetags.crispy_forms_field import css_class
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column
-from service_desk.models import Ticket, Record, TicketAttachment, User
+from service_desk.models import Ticket, Record, TicketAttachment, User, ServiceDeskSettings
 from service_desk.services import validate_attachment
 
 
@@ -253,3 +251,14 @@ class RecordEditForm(forms.ModelForm):
                     Row(Column('message'))
                     )
             )
+
+class ServiceDeskSettingsForm(forms.ModelForm):
+    class Meta:
+        model = ServiceDeskSettings
+        fields = ['notification_enabled', 'central_notification_enabled', 'agent_notification_enabled']
+        widgets = {}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False

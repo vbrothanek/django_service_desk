@@ -11,7 +11,7 @@ Usage:
 '''
 
 class Command(BaseCommand):
-    groups = ['Agents', 'Managers', 'Customers']
+    groups = ['Agents', 'Managers', 'Customers', 'Admins', 'Supervisors']
 
     help = f'Sets up the groups ({groups}) for service desk.'
 
