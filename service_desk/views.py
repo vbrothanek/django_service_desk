@@ -5,14 +5,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django_tables2 import RequestConfig
 from .filters import TicketFilter, RecordFilter
 from .models import Ticket, Company, Record, TicketReadStatus, TicketAttachment, StatusLevel, ServiceDeskSettings, \
-    ServiceDeskEmail
+    ServiceDeskEmail, User
 from django.contrib.auth.decorators import login_required
 from service_desk.forms import TicketForm, TicketAttachmentForm, TicketDetailForm, TicketDetailFollowersForm, \
-    NewRecordForm, RecordEditForm, ServiceDeskSettingsForm
+    NewRecordForm, RecordEditForm, ServiceDeskSettingsForm, UserProfileForm
 from django.core.paginator import Paginator
 from .notifications import send_record_notification
 from .tables import TicketTable, RecordTable
 from django.db.models import Max
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.contrib import messages
 
 
 @login_required
@@ -461,12 +464,25 @@ def settings_view(request):
         if form.is_valid():
             instance = form.save()
             new_emails = request.POST.getlist('central_emails') #Get new emails from emails field
-            instance.emails.all().delete() #Delete all old emails
+
+            valid_emails = []
+            invalid_emails = []
 
             for email in new_emails:
-                ServiceDeskEmail.objects.create(service_desk=instance, email=email) #Settings is ServiceDeskSettings as ForeignKey.
+                try:
+                    validate_email(email)
+                    valid_emails.append(email)
+                except ValidationError:
+                    invalid_emails.append(email)
 
-            return redirect('service_desk:settings')
+            if invalid_emails:
+                messages.error(request, f"Invalid email addresses: {','.join(invalid_emails)}")
+            else:
+                instance.emails.all().delete() #Delete all old emails
+                for email in new_emails:
+                    ServiceDeskEmail.objects.create(service_desk=instance, email=email) #Settings is ServiceDeskSettings as ForeignKey.
+
+                return redirect('service_desk:settings')
     else:
         form = ServiceDeskSettingsForm(instance=instance)
 
@@ -478,3 +494,19 @@ def settings_view(request):
     }
 
     return render(request, 'service_desk/settings.html', context)
+
+@login_required
+def profile_view(request):
+    user = request.user
+
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('service_desk:profile')
+    else:
+        form = UserProfileForm(instance=user)
+
+    context = {'form': form}
+
+    return render(request, 'service_desk/profile_settings.html', context)

@@ -1,7 +1,7 @@
 from django.db.models.signals import m2m_changed, post_save, pre_save
 from django.dispatch import receiver
 from .models import User, Record, Ticket
-from .services import mark_existing_tickets_as_read
+from .services import mark_existing_tickets_as_read, create_notification_receiver_list
 from django.utils import timezone
 from .notifications import send_new_ticket_notification, send_update_ticket_notification, send_record_notification
 
@@ -53,7 +53,8 @@ Signal when ticket is created send email notification to customers or agents.
 @receiver(post_save, sender=Ticket)
 def send_ticket_mail_notification(sender, instance, created, **kwargs):
     if created:
-        send_new_ticket_notification(instance)
+        receivers = create_notification_receiver_list()
+        send_new_ticket_notification(instance, receivers)
 
 
 """
@@ -87,6 +88,5 @@ def send_update_mail_notification(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Record)
 def send_new_record_mail_notification(sender, instance, created, **kwargs):
     if created:
-        # print(instance.message)
-        # print(instance.user.get_full_name())
-        send_record_notification(instance)
+        receivers = create_notification_receiver_list()
+        send_record_notification(instance, receivers)

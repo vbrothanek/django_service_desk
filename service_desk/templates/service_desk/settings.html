@@ -10,6 +10,8 @@
 	<h3 class="mb-0 fw-light">Settings</h3>
 	<hr class="opacity-25">
 
+	{% include 'service_desk/include/messages.html' %}
+
 	<div class="settings-page">
 		<form method="post">
 			{% csrf_token %}
@@ -32,10 +34,10 @@
 			<div class="mb-3 settings-option">
 				<div class="settings-option-grid">
 					<div>
-						<label class="form-check-label" for="id_central_notification_enabled">Send to central emails
-							only</label>
-						<p class="text-muted small fst-italic mb-0">When enabled, notifications are sent only to the
-							central email addresses defined below.</p>
+						<label class="form-check-label" for="id_central_notification_enabled">Send to central
+							emails</label>
+						<p class="text-muted small fst-italic mb-0">When enabled, notifications are sent to the central
+							email addresses defined below.</p>
 					</div>
 					<div class="form-check form-switch d-flex align-items-center ms-4">
 						<input id="central-emails-switcher" class="form-check-input" type="checkbox" role="switch"
@@ -45,7 +47,8 @@
 				</div>
 			</div>
 
-			<div class="mb-3 settings-option" id="settings-emails-filed" {% if not form.central_notification_enabled.value %}hidden{% endif %}>
+			<div class="mb-3 settings-option" id="settings-emails-filed"
+				 {% if not form.central_notification_enabled.value %}hidden{% endif %}>
 				<label class="form-check-label mb-1" for="id_email_address">Central email addresses</label>
 				<p class="text-muted small fst-italic mb-2">Emails that will receive notifications when central
 					notifications are enabled.</p>

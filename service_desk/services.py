@@ -1,4 +1,6 @@
 from .models import Ticket, TicketReadStatus
+from .models import ServiceDeskSettings
+from django.contrib.auth.models import Group
 import os
 from django import forms
 
@@ -57,3 +59,25 @@ def validate_attachment(file):
         raise forms.ValidationError(f'Uploaded file is too large. Max file size is {MAX_FILE_SIZE}.')
 
     return file
+
+def create_notification_receiver_list():
+    receiver_list =[]
+    settings = ServiceDeskSettings.objects.first()
+
+    if not settings or not settings.notification_enabled:
+        return None
+
+    if settings.central_notification_enabled:
+        emails = settings.emails.values_list('email', flat=True)
+        receiver_list.extend(emails)
+
+    if settings.agent_notification_enabled:
+        agent_emails = Group.objects.get(name='Agents').user_set.filter(
+            email_notifications=True).values_list('email', flat=True)
+
+        receiver_list.extend(agent_emails)
+
+    return receiver_list
+
+
+

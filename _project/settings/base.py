@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
 from pathlib import Path
+from django.contrib.messages import constants as messages
 
 from django.conf.global_settings import EMAIL_BACKEND
 from dotenv import load_dotenv
@@ -19,7 +20,6 @@ load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -34,7 +34,6 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
-
 
 # Application definition
 
@@ -85,7 +84,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = '_project.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
@@ -106,7 +104,6 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -153,7 +150,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
@@ -170,7 +166,7 @@ MEDIA_ROOT = BASE_DIR / '_media'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-#Django Tables2
+# Django Tables2
 DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap5.html"
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -184,3 +180,7 @@ EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 SITE_URL = os.getenv('SITE_URL')
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+}

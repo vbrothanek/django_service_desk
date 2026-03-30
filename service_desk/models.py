@@ -26,6 +26,7 @@ class Company(models.Model):
 class User(AbstractUser):
     phone = models.CharField(max_length=16, blank=True)
     companies = models.ManyToManyField(Company, related_name='users')
+    email_notifications = models.BooleanField(default=True)
 
     def __str__(self):
         return self.get_full_name() or self.username

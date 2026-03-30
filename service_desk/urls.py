@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.default_view),  # default_view - redirect to login or dashboard
     path('dashboard/', views.dashboard_view, name='dashboard'),  # dashboard_view
     path('settings/', views.settings_view, name='settings'), # settings view
+    path('profile/', views.profile_view, name='profile'), # profile view
     path('tickets/', views.tickets_view, name='tickets'),  # tickets_view
     path('tickets/create/', views.create_ticket_view, name='new_ticket'),  # create_ticket_view
     path('tickets/poll/', views.tickets_poll_view, name='tickets_poll'), #Polling tickets view

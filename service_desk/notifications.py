@@ -16,7 +16,7 @@ def _send_email(subject, context, template, recipients):
     email.send(fail_silently=True)
 
 
-def send_new_ticket_notification(instance):
+def send_new_ticket_notification(instance, receivers):
     ticket_url = f"{settings.SITE_URL}{reverse('service_desk:ticket_detail', args=[instance.ticket_number])}"
     subject = f"[#{instance.ticket_number}] {instance.subject}"
     context = {
@@ -31,7 +31,7 @@ def send_new_ticket_notification(instance):
             _send_email(subject, context, 'service_desk/email/ticket_created_customer.html', [instance.requester.email])
 
         # Email to agent or central email
-        _send_email(subject, context, 'service_desk/email/ticket_created_agent.html', ['vbrothanek@brotel.cz'])
+        _send_email(subject, context, 'service_desk/email/ticket_created_agent.html', receivers)
 
     elif instance.user.groups.filter(name__in=['Agents', 'Admins']).exists():
         if instance.requester:
@@ -51,7 +51,7 @@ def send_update_ticket_notification(instance):
         _send_email(subject, context, 'service_desk/email/ticket_updated_customer.html', [instance.requester.email])
 
 
-def send_record_notification(instance):
+def send_record_notification(instance, receivers):
     ticket_url = f"{settings.SITE_URL}{reverse('service_desk:ticket_detail', args=[instance.ticket.ticket_number])}"
     subject = f"[#{instance.ticket.ticket_number}] {instance.ticket.subject}"
     context = {
@@ -61,7 +61,8 @@ def send_record_notification(instance):
     }
 
     if instance.user.groups.filter(name__in=['Managers', 'Customers']).exists():
-        _send_email(subject, context, 'service_desk/email/record_created_agent.html', ['vbrothanek@brotel.cz'])
+        _send_email(subject, context, 'service_desk/email/record_created_agent.html', receivers)
+
     elif instance.user.groups.filter(name__in=['Agents', 'Admins']).exists():
         if instance.ticket.requester:
             _send_email(subject, context, 'service_desk/email/record_created_customer.html', [instance.ticket.requester.email])
