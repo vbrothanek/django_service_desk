@@ -4,14 +4,19 @@ A web-based help desk / ticketing system built with Django. Supports role-based 
 
 ## Features
 
-- **Role-based access control** — Agents, Managers, Customers with different permissions
+- **Role-based access control** — Agents, Managers, Customers, Admins, Supervisors with different permissions
 - **Ticket management** — Create, assign, prioritize, and track tickets through a full status workflow
+- **Requester field** — Agents can assign a requester (customer) to a ticket; dynamically loaded based on selected company
 - **Internal records** — Agents can add internal notes invisible to customers
 - **File attachments** — Upload images, documents, archives (max 30 MB per file)
 - **Follower system** — Subscribe to tickets to track updates
 - **Read/unread tracking** — See which tickets have new activity
 - **Dynamic UI** — HTMX-powered pagination and modals, no page reloads
 - **Filterable tables** — Filter and sort tickets by status, priority, company, date, assignee
+- **Email notifications** — Automatic notifications on ticket creation, status/assignee change, and new records
+- **Admin settings page** — Configure notification behavior and central email addresses via UI
+- **User profile settings** — Each user can enable or disable their own email notifications
+- **Context-aware navigation** — Sidebar and menus adapt based on user role
 
 ## Tech Stack
 
@@ -82,6 +87,18 @@ DJANGO_SETTINGS_MODULE=_project.settings.local
 
 # Custom admin URL (security through obscurity)
 ADMIN_URL=your-custom-admin-path
+
+# Email (SMTP)
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=465
+EMAIL_HOST_USER=your-email@example.com
+EMAIL_HOST_PASSWORD=your-email-password
+EMAIL_USE_TLS=False
+EMAIL_USE_SSL=True
+DEFAULT_FROM_EMAIL=your-email@example.com
+
+# Site URL (used in email notification links)
+SITE_URL=http://localhost:8000
 ```
 
 To generate a secure secret key:
@@ -118,7 +135,7 @@ python manage.py migrate
 python manage.py setup_groups
 ```
 
-This creates three groups: **Agents**, **Managers**, **Customers**.
+This creates five groups: **Agents**, **Managers**, **Customers**, **Admins**, **Supervisors**.
 
 ### 8. Create a superuser
 
@@ -159,6 +176,8 @@ Sign-up is **disabled by default** — users must be created via Django admin at
 - **Agents** — full access, can manage all tickets and add internal records
 - **Managers** — access limited to their company's tickets, read-only ticket fields
 - **Customers** — access limited to their company's tickets, cannot see internal records
+- **Admins** — access to service desk settings page (notification configuration)
+- **Supervisors** — supervisory role for future use
 
 Users must also be associated with a **Company** via the admin panel.
 
@@ -171,6 +190,8 @@ Users must also be associated with a **Company** via the admin panel.
 | `/tickets/` | Full ticket list with filters |
 | `/tickets/create/` | Create a new ticket |
 | `/tickets/<number>/` | Ticket detail, records, attachments |
+| `/settings/` | Admin settings page (Admins only) |
+| `/profile/` | User profile settings |
 | `/accounts/login/` | Login (allauth) |
 | `/<ADMIN_URL>/` | Django admin |
 
@@ -196,7 +217,10 @@ django-service-desk/
 │   ├── filters.py
 │   ├── tables.py
 │   ├── signals.py
-│   └── services.py
+│   ├── services.py
+│   ├── notifications.py    # Email notification functions
+│   ├── context_processors.py  # User role context (is_agent, is_admin, ...)
+│   └── adapters.py         # Allauth adapter (disables sign-up)
 ├── _media/                 # Uploaded files
 ├── _static/                # Collected static files
 ├── manage.py
