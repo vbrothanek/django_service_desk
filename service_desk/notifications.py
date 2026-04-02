@@ -26,7 +26,7 @@ def send_new_ticket_notification(instance, receivers):
 
     if instance.user.groups.filter(name__in=['Managers' ,'Customers']).exists():
 
-        if instance.requester:
+        if instance.requester and instance.requester.email_notifications:
             # Email to customer
             _send_email(subject, context, 'service_desk/email/ticket_created_customer.html', [instance.requester.email])
 
@@ -34,7 +34,7 @@ def send_new_ticket_notification(instance, receivers):
         _send_email(subject, context, 'service_desk/email/ticket_created_agent.html', receivers)
 
     elif instance.user.groups.filter(name__in=['Agents', 'Admins']).exists():
-        if instance.requester:
+        if instance.requester and instance.requester.email_notifications:
             # Email to customer
             _send_email(subject, context, 'service_desk/email/ticket_created_customer.html', [instance.requester.email])
 
@@ -47,7 +47,7 @@ def send_update_ticket_notification(instance):
         'ticket_url': ticket_url
     }
 
-    if instance.requester:
+    if instance.requester and instance.requester.email_notifications:
         _send_email(subject, context, 'service_desk/email/ticket_updated_customer.html', [instance.requester.email])
 
 
@@ -64,5 +64,5 @@ def send_record_notification(instance, receivers):
         _send_email(subject, context, 'service_desk/email/record_created_agent.html', receivers)
 
     elif instance.user.groups.filter(name__in=['Agents', 'Admins']).exists():
-        if instance.ticket.requester:
+        if instance.ticket.requester and instance.ticket.requester.email_notifications:
             _send_email(subject, context, 'service_desk/email/record_created_customer.html', [instance.ticket.requester.email])
